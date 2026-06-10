@@ -1,0 +1,7 @@
+.DS_Store
+*.log
+*.bak
+__pycache__/
+*.pyc
+.vercel
+node_modules/

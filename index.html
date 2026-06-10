@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bambrew Grants Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: 'DM Sans', -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #1f2933;
+    background: #f4f6f8;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  /* Headings use Fraunces for editorial character */
+  .masthead h1,
+  .topbar h1,
+  h2, h3, h4,
+  .news-card .nc-title,
+  .modal h3,
+  .calendar-controls h2,
+  .tile .value {
+    font-family: 'Fraunces', Georgia, "Times New Roman", serif;
+    letter-spacing: -0.01em;
+  }
+
+  /* === Hamburger + Drawer === */
+  .hamburger {
+    background: transparent;
+    border: 0;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 10px;
+    margin-right: 14px;
+    border-radius: 4px;
+    position: relative;
+    line-height: 1;
+  }
+  .hamburger:hover { background: rgba(255,255,255,0.1); }
+  .hamburger-badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    background: #b03030;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 9px;
+    line-height: 1.4;
+  }
+  .topbar-left { display: flex; align-items: center; }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .brand-logo {
+    height: 36px;
+    width: auto;
+    display: block;
+  }
+
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,42,30,0.5);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .drawer-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .drawer {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 460px;
+    max-width: 94vw;
+    background: #fff;
+    z-index: 201;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+    transform: translateX(-100%);
+    transition: transform 0.28s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-header {
+    background: linear-gradient(90deg, #2a8f5e 0%, #1a6a45 100%);
+    color: #fff;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .drawer-header h3 {
+    margin: 0;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+  }
+  .drawer-header .drawer-sub {
+    font-size: 10.5px;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+  .drawer-close {
+    background: rgba(255,255,255,0.15);
+    border: 0;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .drawer-close:hover { background: rgba(255,255,255,0.28); }
+  .drawer-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  /* === Top bar === */
+  .topbar {
+    background: #0f2a1e;
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+  .topbar h1 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .topbar .eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: #6cbf91;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .topbar .meta {
+    font-size: 11px;
+    color: #c9d3ce;
+    text-align: right;
+  }
+
+  .container { max-width: 1400px; margin: 18px auto; padding: 0 18px 60px; }
+
+  /* === Summary tiles === */
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .tile {
+    background: #fff;
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .tile .label {
+    font-size: 13px;
+    color: #000;
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .tile .value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0f2a1e;
+  }
+  .tile .sub { font-size: 11px; color: #6b7680; margin-top: 3px; }
+  .tile.clickable {
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .tile.clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .tile.clickable .sub {
+    color: #2a8f5e;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* === What's New section === */
+  .news-section {
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+  .news-header {
+    background: linear-gradient(90deg, #2a8f5e 0%, #1a6a45 100%);
+    color: #fff;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .news-header h3 {
+    margin: 0;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+  }
+  .news-header .news-meta {
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  .news-body { padding: 14px 18px 6px; }
+
+  .keyword-panel {
+    background: #f4f8f5;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e3e8eb;
+  }
+  .keyword-panel .kp-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #1a6a45;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .keyword-group {
+    margin: 5px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+  }
+  .keyword-group .kg-label {
+    font-size: 10.5px;
+    color: #1a6a45;
+    font-weight: 700;
+    margin-right: 6px;
+    min-width: 130px;
+  }
+  .keyword-pill {
+    display: inline-block;
+    background: #fff;
+    color: #1c4170;
+    border: 1px solid #c5d4e3;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .keyword-pill:hover { background: #d8e6f5; }
+  .keyword-batch {
+    margin-left: 4px;
+    background: #2a8f5e;
+    color: #fff;
+    border: 0;
+    padding: 4px 11px;
+    border-radius: 12px;
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .keyword-batch:hover { background: #1e6f48; }
+
+  .news-card {
+    border-left: 3px solid #2a8f5e;
+    background: #fafbfa;
+    margin-bottom: 8px;
+    padding: 9px 12px;
+    border-radius: 4px;
+  }
+  .news-card.regulatory  { border-left-color: #b88410; background: #fdf8eb; }
+  .news-card.competitive { border-left-color: #842121; background: #fdf4f4; }
+  .news-card.own         { border-left-color: #1c4170; background: #eef4fb; }
+  .news-card .nc-date {
+    font-size: 10px;
+    color: #6b7680;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .news-card .nc-title {
+    font-size: 12.5px;
+    color: #0f2a1e;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    line-height: 1.35;
+  }
+  .news-card .nc-sig {
+    font-size: 11px;
+    color: #1f2933;
+    margin-bottom: 5px;
+    line-height: 1.4;
+  }
+  .news-card .nc-source {
+    font-size: 10.5px;
+    color: #57636d;
+  }
+  .news-card .nc-source a { color: #1c4170; text-decoration: none; }
+  .news-card .nc-link {
+    background: transparent;
+    color: #2a8f5e;
+    border: 1px solid #2a8f5e;
+    padding: 2px 9px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 10.5px;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+  .news-card .nc-link:hover { background: #2a8f5e; color: #fff; }
+
+  .news-card .nc-add {
+    background: #fff8e1;
+    color: #7a4d05;
+    border: 1px solid #f5d77a;
+    padding: 2px 9px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 10.5px;
+    font-weight: 700;
+    margin-left: 6px;
+  }
+  .news-card .nc-add:hover { background: #b88410; color: #fff; border-color: #b88410; }
+
+  .grant-flag {
+    display: inline-block;
+    margin-left: 8px;
+    background: #fdecc8;
+    color: #7a4d05;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 9px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  .qa-input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 12.5px;
+    padding: 7px 9px;
+    border: 1px solid #d8dde2;
+    border-radius: 5px;
+    margin-top: 2px;
+    color: #1f2933;
+    background: #fff;
+  }
+  .qa-input:focus { outline: 2px solid #2a8f5e; outline-offset: -1px; }
+
+  /* === Controls === */
+  .controls {
+    background: #fff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .controls label { font-size: 11px; color: #6b7680; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; }
+  .controls select, .controls input {
+    font-family: inherit;
+    font-size: 12px;
+    padding: 6px 10px;
+    border: 1px solid #d8dde2;
+    border-radius: 5px;
+    background: #fff;
+    color: #1f2933;
+  }
+  .view-toggle { display: inline-flex; border: 1px solid #d8dde2; border-radius: 5px; overflow: hidden; }
+  .view-toggle button {
+    background: #fff;
+    border: 0;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #57636d;
+    font-weight: 600;
+  }
+  .view-toggle button.active { background: #2a8f5e; color: #fff; }
+
+  /* === View containers === */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* === List view === */
+  .grant-table {
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-collapse: collapse;
+    font-size: 12px;
+    table-layout: fixed;
+  }
+  .grant-table thead th {
+    background: #0f2a1e;
+    color: #fff;
+    text-align: left;
+    padding: 9px 11px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .grant-table tbody td {
+    padding: 10px 11px;
+    border-bottom: 1px solid #eaedef;
+    vertical-align: top;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  .grant-table tbody tr:hover td { background: #f8fafa; }
+  .grant-table .grant-name { font-weight: 700; color: #0f2a1e; }
+  .grant-table .grant-name a { color: #1c4170; text-decoration: none; font-size: 10.5px; display: block; font-weight: 400; margin-top: 2px; }
+
+  .quick-actions {
+    display: flex;
+    gap: 4px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+  }
+  .qa-btn {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    border: 1px solid #d8dde2;
+    background: #fff;
+    color: #1c4170;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .qa-btn:hover { background: #f0f4f8; }
+  .qa-btn.verify { color: #155c3a; border-color: #c5e0d0; }
+  .qa-btn.verify:hover { background: #eef7f1; }
+
+  .freshness {
+    display: inline-block;
+    font-size: 9.5px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-top: 4px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .freshness-fresh { background: #d6efe0; color: #155c3a; }
+  .freshness-aging { background: #fdecc8; color: #7a4d05; }
+  .freshness-stale { background: #fadcdc; color: #842121; }
+  .freshness-never { background: #e6e8eb; color: #3f4a55; }
+
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .pill-india        { background: #ffe8d6; color: #7a4d05; }
+  .pill-eu           { background: #d8e6f5; color: #1c4170; }
+  .pill-uk           { background: #e4dcf5; color: #432875; }
+  .pill-multilateral { background: #d6efe0; color: #155c3a; }
+  .pill-global       { background: #e6e8eb; color: #3f4a55; }
+
+  .type-pill {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 9.6px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+  }
+  .type-deadline { background: #fadcdc; color: #842121; }
+  .type-cyclical { background: #fdecc8; color: #7a4d05; }
+  .type-rolling  { background: #d6efe0; color: #155c3a; }
+
+  .status-select {
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 12px;
+    border: 0;
+    cursor: pointer;
+    width: 100%;
+  }
+  .status-not-started { background: #e6e8eb; color: #3f4a55; }
+  .status-in-progress { background: #fdecc8; color: #7a4d05; }
+  .status-submitted   { background: #d8e6f5; color: #1c4170; }
+  .status-won         { background: #d6efe0; color: #155c3a; }
+  .status-lost        { background: #fadcdc; color: #842121; }
+  .status-skipped     { background: #ebebeb; color: #6b7680; text-decoration: line-through; }
+
+  .days-left {
+    font-weight: 700;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .days-urgent { background: #fdecc8; color: #7a4d05; }
+  .days-critical { background: #fadcdc; color: #842121; }
+  .days-comfortable { background: #d6efe0; color: #155c3a; }
+  .days-passed { background: #ebebeb; color: #6b7680; }
+  .days-rolling { background: #d8e6f5; color: #1c4170; }
+
+  .notes-input {
+    width: 100%;
+    min-height: 38px;
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 11.5px;
+    border: 1px solid #d8dde2;
+    border-radius: 4px;
+    resize: vertical;
+    color: #1f2933;
+  }
+  .notes-input:focus { outline: 2px solid #2a8f5e; outline-offset: -1px; }
+
+  /* === Calendar view === */
+  .calendar-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    padding: 12px 18px;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .calendar-controls h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #0f2a1e;
+  }
+  .calendar-controls button {
+    background: #2a8f5e;
+    color: #fff;
+    border: 0;
+    padding: 7px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .calendar-controls button:hover { background: #1e6f48; }
+  .calendar-controls .today-btn {
+    background: #fff;
+    color: #2a8f5e;
+    border: 1.5px solid #2a8f5e;
+    margin-left: 8px;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #e3e8eb;
+    gap: 1px;
+    padding: 1px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+  }
+  .calendar-day-label {
+    background: #0f2a1e;
+    color: #fff;
+    padding: 7px 10px;
+    text-align: center;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .calendar-cell {
+    background: #fff;
+    min-height: 92px;
+    padding: 5px 6px;
+    position: relative;
+    font-size: 11px;
+  }
+  .calendar-cell.outside { background: #fafbfc; color: #b8c0c5; }
+  .calendar-cell.today { background: #fff8e1; }
+  .calendar-cell .day-number {
+    font-weight: 700;
+    color: #0f2a1e;
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+  .calendar-cell.outside .day-number { color: #b8c0c5; }
+  .calendar-cell.today .day-number { color: #b88410; }
+  .event {
+    display: block;
+    font-size: 10px;
+    padding: 2px 5px;
+    margin-bottom: 2px;
+    border-radius: 3px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .event.deadline { background: #b03030; }
+  .event.launch   { background: #1c4170; }
+  .event.cyclical { background: #b88410; }
+
+  .rolling-strip {
+    background: #fff;
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .rolling-strip h3 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #0f2a1e;
+  }
+  .rolling-chip {
+    display: inline-block;
+    background: #d6efe0;
+    color: #155c3a;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin: 3px 5px 3px 0;
+    font-weight: 600;
+  }
+
+  /* === Footer === */
+  .footer-note {
+    margin-top: 22px;
+    font-size: 11px;
+    color: #6b7680;
+    text-align: center;
+  }
+  .footer-note button {
+    background: transparent;
+    color: #b03030;
+    border: 1px solid #b03030;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+
+  /* === Modal === */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 42, 30, 0.55);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 10px;
+    padding: 22px 26px;
+    max-width: 560px;
+    width: 92%;
+    max-height: 86vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+  .modal h3 { margin: 0 0 6px 0; color: #0f2a1e; font-size: 16px; }
+  .modal .meta-row { font-size: 11.5px; color: #57636d; margin-bottom: 12px; }
+  .modal .row { margin-bottom: 9px; }
+  .modal .row .label-k { font-size: 10.5px; text-transform: uppercase; color: #6b7680; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 2px; }
+  .modal .row .val { font-size: 12.5px; color: #1f2933; }
+  .modal-close {
+    background: #0f2a1e;
+    color: #fff;
+    border: 0;
+    padding: 6px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 12px;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" onclick="openDrawer()" title="Open What's New" aria-label="Open What's New menu">
+      ☰
+      <span class="hamburger-badge" id="hamburger-badge">9</span>
+    </button>
+    <div>
+      <div class="eyebrow">Bambrew · Founder's Office</div>
+      <h1>Grants Tracker · Dashboard</h1>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="meta">
+      <span id="last-refresh">News auto-refresh status…</span><br>
+      All changes auto-save to your browser
+    </div>
+    <svg class="brand-logo" viewBox="0 0 180 56" xmlns="http://www.w3.org/2000/svg" aria-label="Bambrew">
+      <circle cx="30"  cy="28" r="22" fill="#5DAA70"/>
+      <circle cx="90"  cy="28" r="22" fill="#7BC9DA"/>
+      <circle cx="150" cy="28" r="22" fill="#F2C94C"/>
+    </svg>
+  </div>
+</div>
+
+<!-- Drawer (hidden until hamburger click) -->
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" aria-label="What's New drawer">
+  <div class="drawer-header">
+    <div>
+      <h3>📰 What's New</h3>
+      <div class="drawer-sub">Grant updates &amp; sector signals · Snapshot June 2026</div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close">×</button>
+  </div>
+  <div class="drawer-content">
+    <div class="news-body" id="news-body" style="padding: 14px 18px 18px;"></div>
+  </div>
+</aside>
+
+<div class="container">
+
+  <!-- Summary tiles -->
+  <div class="tiles" id="tiles"></div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="view-toggle">
+      <button id="btn-list" class="active" onclick="setView('list')">List</button>
+      <button id="btn-calendar" onclick="setView('calendar')">Calendar</button>
+    </div>
+
+    <label>Status</label>
+    <select id="filter-status" onchange="render()">
+      <option value="">All</option>
+      <option value="not-started">Not Started</option>
+      <option value="in-progress">In Progress</option>
+      <option value="submitted">Submitted</option>
+      <option value="won">Won</option>
+      <option value="lost">Lost</option>
+      <option value="skipped">Skipped</option>
+    </select>
+
+    <label>Region</label>
+    <select id="filter-region" onchange="render()">
+      <option value="">All</option>
+      <option value="india">India</option>
+      <option value="eu">EU</option>
+      <option value="uk">UK</option>
+      <option value="multilateral">Multilateral</option>
+      <option value="global">Global / Corp</option>
+    </select>
+
+    <label>Type</label>
+    <select id="filter-type" onchange="render()">
+      <option value="">All</option>
+      <option value="deadline">Fixed Deadline</option>
+      <option value="cyclical">Cyclical</option>
+      <option value="rolling">Rolling</option>
+    </select>
+
+    <label>Sort</label>
+    <select id="sort-by" onchange="render()">
+      <option value="deadline">Deadline</option>
+      <option value="name">Name</option>
+      <option value="value">Value</option>
+      <option value="status">Status</option>
+    </select>
+  </div>
+
+  <!-- List view -->
+  <div id="view-list" class="view active">
+    <table class="grant-table">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Grant</th>
+          <th style="width: 9%;">Region</th>
+          <th style="width: 8%;">Type</th>
+          <th style="width: 11%;">Value</th>
+          <th style="width: 11%;">Deadline / Cycle</th>
+          <th style="width: 7%;">Days Left</th>
+          <th style="width: 10%;">Status</th>
+          <th style="width: 14%;">Notes</th>
+        </tr>
+      </thead>
+      <tbody id="grants-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Calendar view -->
+  <div id="view-calendar" class="view">
+    <div class="calendar-controls">
+      <button onclick="navMonth(-1)">← Prev</button>
+      <div>
+        <h2 id="cal-title"></h2>
+      </div>
+      <div>
+        <button class="today-btn" onclick="goToday()">Today</button>
+        <button onclick="navMonth(1)">Next →</button>
+      </div>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+    <div class="rolling-strip">
+      <h3>Rolling &amp; cyclical (no fixed deadline this month — apply any time)</h3>
+      <div id="rolling-chips"></div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <span id="past-deadline-toggle"></span>
+    <br>
+    Built for Bambrew · grants tracked across India, EU, UK, multilateral &amp; corporate channels.
+    <button onclick="if(confirm('Reset all status &amp; notes? This cannot be undone.')){localStorage.removeItem('bambrew-grants');localStorage.removeItem('bambrew-user-grants');location.reload();}">Reset all my progress</button>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target.id==='modal-overlay')closeModal()">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<script>
+// ============================================================
+// GRANT DATA
+// ============================================================
+const GRANTS = [
+  // === India ===
+  { id: 'bioe3', name: 'BioE3 Policy (BIRAC)', region: 'india', type: 'deadline',
+    value: 'Varies', domain: 'Bio-manufacturing umbrella; biopolymers',
+    eligibility: 'Indian biotech / bio-manufacturing entities; biopolymer SKUs qualify',
+    url: 'https://birac.nic.in/cfp.php',
+    launch: '2025-11-21', deadline: '2026-06-30',
+    notes: 'Highest strategic fit; मूलांकुर hubs under this policy' },
+
+  { id: 'birac-big', name: 'BIRAC BIG (Biotechnology Ignition Grant)', region: 'india', type: 'cyclical',
+    value: 'Up to ₹50 lakh', domain: 'Biotech innovation with commercialisation potential',
+    eligibility: 'Indian biotech startups; TRL 4+',
+    url: 'https://birac.nic.in/big.php',
+    launch: '2026-07-01', deadline: '2026-07-31',
+    notes: 'Biannual: 1 Jan and 1 Jul calls each year. Next call opens 1 Jul 2026.' },
+
+  { id: 'birac-bipp', name: 'BIRAC BIPP', region: 'india', type: 'rolling',
+    value: 'Up to ₹5 cr (equity/grant mix)', domain: 'Industry-academia biotech partnerships',
+    eligibility: 'Indian biotech firms partnered with R&D institute',
+    url: 'https://birac.nic.in/',
+    notes: 'Useful if Bambrew formalises an IIT/IISc/CFTRI partnership' },
+
+  { id: 'birac-rdi', name: 'BIRAC RDI Fund', region: 'india', type: 'rolling',
+    value: '₹2,000 cr (5-yr pool)', domain: 'Translational → growth-stage biotech',
+    eligibility: 'Indian biotech ventures across stages',
+    url: 'https://birac.nic.in/',
+    notes: 'New fund (2026); grants, equity, quasi-equity, long-term debt blends.' },
+
+  { id: 'ccamp-coe', name: 'C-CAMP CoE Sustainability & Climate Action', region: 'india', type: 'cyclical',
+    value: 'Up to ₹50 lakh', domain: 'Sustainability, circular economy, climate',
+    eligibility: 'Indian startups in sustainability / climate',
+    url: 'https://www.ccamp.res.in/',
+    launch: '2026-02-17', deadline: '2026-04-01',
+    notes: '2026 cycle is past — track for 2027 cycle (~Feb 2027 announcement, ~Apr 2027 deadline).' },
+
+  { id: 'ccamp-win', name: 'C-CAMP WIN CoE (Non-Dilutive)', region: 'india', type: 'rolling',
+    value: 'Non-dilutive (varies)', domain: 'Innovation; bio-manufacturing',
+    eligibility: 'Indian deep-tech / bio-manufacturing',
+    url: 'https://www.ccamp.res.in/',
+    notes: 'Equity-friendly; aligns with scale-up stage.' },
+
+  { id: 'tdb-finland', name: 'TDB India–Finland Joint Innovation Call 2026', region: 'india', type: 'deadline',
+    value: '₹2.5 cr', domain: 'Bilateral tech collaboration (circular & climate)',
+    eligibility: 'Indian company + Finnish partner consortium',
+    url: 'https://www.tdb.gov.in/',
+    launch: '2026-04-01', deadline: '2026-08-28',
+    notes: 'Needs Finnish co-applicant; partner-mapping required. Closes at 16:00 IST.' },
+
+  { id: 'nidhi-prayas', name: 'DST NIDHI PRAYAS Cohort 3.0', region: 'india', type: 'cyclical',
+    value: '₹10 lakh prototype grant', domain: 'Prototype-stage hardtech / deeptech',
+    eligibility: 'Innovators via PRAYAS Centres (TBIs)',
+    url: 'https://nidhi-prayas.org/',
+    launch: '2026-05-19', deadline: '2026-06-19',
+    notes: 'Apply via a PRAYAS-affiliated incubator (e.g. C-CAMP, IIM-B NSRCEL).' },
+
+  { id: 'dst-itbi', name: 'DST-iTBI Ignition Grant (Cohort 3.0)', region: 'india', type: 'cyclical',
+    value: 'Up to ₹10 lakh', domain: 'GreenTech / CleanTech / DeepTech',
+    eligibility: 'Indian S&T startups at idea / prototype stage',
+    url: 'https://www.indiascienceandtechnology.gov.in/funding-opportunities/startups',
+    notes: 'Cohort-based annual call.' },
+
+  { id: 'sisfs', name: 'Startup India Seed Fund (SISFS)', region: 'india', type: 'cyclical',
+    value: '₹20L grant + ₹50L convertible debt', domain: 'DPIIT-recognised startups, any sector',
+    eligibility: 'DPIIT-recognised; <2 yrs old',
+    url: 'https://seedfund.startupindia.gov.in/',
+    launch: '2026-01-01', deadline: '2026-05-31',
+    notes: '2026 cycle is past — next cycle ~May 2027.' },
+
+  { id: 'bioai', name: 'DBT-BIRAC BioE3 BioAI Call', region: 'india', type: 'deadline',
+    value: 'Varies', domain: 'High-performance bio-manufacturing using AI',
+    eligibility: 'Indian biotech + AI/ML capability',
+    url: 'https://birac.nic.in/cfp.php',
+    notes: 'Stretch fit — viable if Bambrew partners on data/AI for process.' },
+
+  { id: 'iit-kanpur-plastics', name: 'IIT Kanpur Plastics Innovation Challenge', region: 'india', type: 'cyclical',
+    value: '₹8–12 lakh', domain: 'Plastic waste & circularity (CSR-backed)',
+    eligibility: 'Indian startups solving plastic-waste challenges',
+    url: 'https://siic.iitk.ac.in/',
+    notes: 'Lower ticket; useful for narrative + ecosystem credibility.' },
+
+  { id: 'elevate', name: 'ELEVATE Karnataka 2026', region: 'india', type: 'deadline',
+    value: 'Up to ₹50 lakh', domain: 'Sector-agnostic; cleantech-friendly',
+    eligibility: 'Karnataka-registered Pvt Ltd / LLP / OPC; ≤10 yrs old',
+    url: 'https://elevate.startupkarnataka.in/',
+    launch: '2026-04-15', deadline: '2026-06-25',
+    notes: 'Bambrew is Karnataka-HQ\'d — direct home-state grant; milestone-based tranches.' },
+
+  { id: 'elevate-nxt', name: 'ELEVATE NxT (Karnataka deeptech)', region: 'india', type: 'cyclical',
+    value: 'Up to ₹1 cr', domain: 'Deeptech incl. green energy / sustainability',
+    eligibility: 'Karnataka deeptech ventures',
+    url: 'https://www.missionstartupkarnataka.org/elevate-karnataka',
+    notes: '₹150 cr corpus; biopolymer-process tech qualifies as deeptech.' },
+
+  { id: 'anic', name: 'NITI Aayog AIM · ANIC', region: 'india', type: 'cyclical',
+    value: 'Up to ₹1 cr', domain: 'Sectoral tech innovations (circular econ in 2026 cohort)',
+    eligibility: 'Indian tech startups',
+    url: 'https://aim.gov.in/anic-overview.php',
+    notes: '2026 cohort highlights circular economy + sustainable systems explicitly.' },
+
+  { id: 'marico', name: 'Marico Innovation Foundation · Indian Innovation Icons 2027', region: 'india', type: 'deadline',
+    value: 'Award + mentorship + follow-on', domain: 'Plastic waste, cleantech, agritech',
+    eligibility: 'Indian innovators with game-changing impact',
+    url: 'https://www.maricoinnovationfoundation.org/innovation-for-india-awards/',
+    launch: '2026-06-01', deadline: '2026-06-30',
+    notes: 'Email innovate@marico.com. Non-cash but brand credibility lever.' },
+
+  { id: 'mahindra-rise', name: 'Mahindra Rise Prize', region: 'india', type: 'cyclical',
+    value: 'Up to USD 1M', domain: 'Disruptive innovation (theme rotates)',
+    eligibility: 'Global; demonstrable working tech',
+    url: 'https://risechallenge.mahindra.com/',
+    notes: 'Watch for sustainability/circular themes.' },
+
+  // === EU / UK ===
+  { id: 'cbe-ju', name: 'Horizon Europe CBE JU 2026 — Films & coatings for circular packaging', region: 'eu', type: 'deadline',
+    value: '€14M topic (€170.7M call)', domain: 'Circular bio-based films & coatings',
+    eligibility: 'EU consortium (typically 3+ orgs ≥3 countries); India = third country',
+    url: 'https://www.cbe.europa.eu/open-calls-proposals',
+    launch: '2026-04-23', deadline: '2026-09-22',
+    notes: 'Sharpest international fit. Requires lining up EU consortium lead. Closes 17:00 CET.' },
+
+  { id: 'life', name: 'EU LIFE Programme 2026 — Circular Economy & Zero Pollution', region: 'eu', type: 'deadline',
+    value: '€79M topic (€2.3B prog.)', domain: 'Circular economy, zero pollution',
+    eligibility: 'EU members + associated countries; SMEs, public, NGOs',
+    url: 'https://cinea.ec.europa.eu/life-calls-proposals-2026_en',
+    deadline: '2026-09-22',
+    notes: 'Pair with CBE JU under one EU partner-mapping exercise.' },
+
+  { id: 'sspp', name: 'UK Innovate UK SSPP', region: 'uk', type: 'rolling',
+    value: '£200K – £4M (R&D); £1M – £12M (demo)', domain: 'Sustainable plastic packaging R&D',
+    eligibility: 'UK-registered businesses',
+    url: 'https://iuk-business-connect.org.uk/materials/smart-sustainable-plastic-packaging/',
+    notes: 'Needs UK entity; viable via UK subsidiary or research partner.' },
+
+  { id: 'earthshot', name: 'The Earthshot Prize', region: 'global', type: 'cyclical',
+    value: '£1M × 5 winners', domain: 'Waste-Free World + 4 other Earthshots',
+    eligibility: 'Proven prototype with measurable environmental impact; nominated',
+    url: 'https://earthshotprize.org/',
+    launch: '2026-10-01', deadline: '2026-11-30',
+    notes: 'Nomination window typically Oct–Nov each year. Need Official Nominator (Innovate UK / WWF India / Commonwealth Sec.).' },
+
+  { id: 'bezos', name: 'Bezos Earth Fund + Earthshot partnership', region: 'global', type: 'rolling',
+    value: '$4.8M pool (varies)', domain: 'Climate / nature / biodegradable bioplastics',
+    eligibility: 'High-potential climate/nature innovations',
+    url: 'https://www.bezosearthfund.org/',
+    notes: 'Bezos Earth Fund explicitly names biodegradable bioplastics as a target.' },
+
+  { id: 'wwf-bezos', name: 'WWF + Bezos Earth Fund Climate Solutions', region: 'global', type: 'rolling',
+    value: 'Varies', domain: 'Climate, biodiversity, ocean',
+    eligibility: 'Mission-aligned NGOs & for-profits',
+    url: 'https://www.worldwildlife.org/our-work/funds/bezos-earth-fund/',
+    notes: 'Often routed via WWF country offices; WWF India is the entry point.' },
+
+  { id: 'amazon-acc', name: 'Amazon Sustainability Accelerator (with EIT Climate-KIC)', region: 'global', type: 'cyclical',
+    value: 'Mentorship + Europe-wide pilot', domain: 'Reusable / sustainable e-commerce packaging',
+    eligibility: 'European startups (currently)',
+    url: 'https://sustainability.aboutamazon.com/operations/the-climate-pledge-fund/sustainability-accelerator',
+    notes: 'Not directly applicable now — watch for Asia expansion.' },
+
+  { id: 'climate-kic', name: 'EIT Climate-KIC calls', region: 'eu', type: 'rolling',
+    value: 'Varies', domain: 'Climate innovation; circular economy',
+    eligibility: 'Mostly EU-based; accepts non-EU partners',
+    url: 'https://www.climate-kic.org/',
+    notes: 'Strong network value even where direct funding is EU-only.' },
+
+  { id: 'gcf', name: 'Green Climate Fund (GCF) · Private Sector Facility', region: 'multilateral', type: 'rolling',
+    value: 'SAP up to USD 25M; PAP > USD 250M', domain: 'Climate mitigation & adaptation',
+    eligibility: 'Indian for-profit as project executor; NABARD packages as DAE',
+    url: 'https://www.greenclimate.fund/countries/india',
+    notes: 'India route: via NABARD as Direct Access Entity. Largest single climate-finance window globally.' },
+
+  { id: 'ifc', name: 'World Bank / IFC Climate & Circular Economy Finance', region: 'multilateral', type: 'rolling',
+    value: 'USD 5–50M (project-specific)', domain: 'Climate, circular economy, sustainable manufacturing',
+    eligibility: 'For-profits with scalable climate-positive models',
+    url: 'https://www.ifc.org/en/what-we-do/sector-expertise/climate-business',
+    notes: 'IFC India has active circular-economy mandate; engage with concept note.' },
+
+  { id: 'adb', name: 'ADB Ventures / ADB Climate Investment Funds', region: 'multilateral', type: 'rolling',
+    value: 'Up to USD 4M (ADB Ventures)', domain: 'Climate-tech, circular economy',
+    eligibility: 'Climate-tech startups in ADB Asia-Pacific (India eligible)',
+    url: 'https://www.adbventures.com/',
+    notes: 'Equity-heavy + technical-assistance grants.' },
+
+  { id: 'ikea-ceic', name: 'IKEA Foundation · CEIC Bengaluru', region: 'global', type: 'cyclical',
+    value: 'Up to €50,000', domain: 'Circular economy + social impact in Bengaluru',
+    eligibility: 'Entrepreneurship Support Orgs (ESOs) in Bengaluru',
+    url: 'https://ikeafoundation.org/grants/circular-economy-catalyst/',
+    launch: '2026-04-01', deadline: '2026-07-31',
+    notes: 'Bengaluru-specific. Masterclasses Apr–Jul 2026 followed by grant round.' },
+
+  { id: 'ikea-ande', name: 'IKEA Foundation + ANDE Waste & Circularity IIF', region: 'global', type: 'cyclical',
+    value: 'Grant pool for SGBs', domain: 'Waste management & circular economy',
+    eligibility: 'SGBs in India and Kenya; routed via ANDE members',
+    url: 'https://andeglobal.org/climate-and-environmental-action/access-to-green-finance/',
+    notes: 'Now in second round of grantees.' },
+
+  { id: 'aws-climate', name: 'AWS Compute for Climate Fellowship', region: 'global', type: 'cyclical',
+    value: 'Share of $4M AWS credits', domain: 'Climate solutions using cloud + compute',
+    eligibility: 'Climate-focused startups with 2-3 month buildable projects',
+    url: 'https://aws.amazon.com/startups/learn/compute-for-climate-fellowship',
+    notes: '2026 cohort active. Credits not cash.' },
+
+  { id: 'msft-cif', name: 'Microsoft Climate Innovation Fund', region: 'global', type: 'rolling',
+    value: 'USD 1–25M equity', domain: 'Climate-tech with early commercial traction',
+    eligibility: 'Revenue / commercial traction needed',
+    url: 'https://www.microsoft.com/en-us/corporate-responsibility/sustainability/climate-innovation-fund',
+    notes: 'Equity vehicle not grant; useful at revenue scale.' },
+
+  { id: 'undp-plastic', name: 'UNDP India · Plastic Waste Management Programme', region: 'multilateral', type: 'rolling',
+    value: 'Programme-funded', domain: 'Plastics circularity, segregation, recycling MRFs',
+    eligibility: 'NGOs & for-profits aligned with UNDP framework',
+    url: 'https://www.undp.org/india/projects/plastic-waste-management',
+    notes: 'Partner-mode entry; proposal direct to UNDP India.' },
+
+  { id: 'nabard-ngif', name: 'NABARD Green Impact Fund (NGIF) + Carbon Fund (NCF)', region: 'india', type: 'rolling',
+    value: '₹1,000 cr (NGIF) + ₹300 cr (NCF)', domain: 'Sustainable farming, climate adaptation, emissions reduction, carbon capture',
+    eligibility: 'Climate-tech / agritech startups; carbon developers; bio-manufacturing applicable',
+    url: 'https://www.nabard.org/climate-actions.aspx',
+    notes: 'NEW (Jan 2026 launch). NABARD in talks with World Bank & Gates Foundation for co-investment. Interest income reduces borrowing costs for implementing agencies.' },
+
+  { id: 'ciic-2026', name: 'Climate Impact Innovations Challenge (CIIC) 2026 · Indonesia', region: 'global', type: 'deadline',
+    value: 'Rp 15 cr (~USD 925K) prize pool + USD 1M carbon credits to finalists', domain: 'Circular economy track: waste & water circularity, climate adaptation',
+    eligibility: 'GLOBALLY OPEN. MVP with commercialisation intent required. Winning solution must be piloted in Indonesia (local partner OK).',
+    url: 'https://climateimpactinnovations.com/',
+    launch: '2026-04-08', deadline: '2026-06-20',
+    notes: 'Backed by East Ventures + Temasek Foundation + Tencent. Indonesia\'s biggest climate-tech competition. 3 tracks; Circular Economy is the direct fit for Bambrew. Closes 23:59 GMT+7.' },
+
+  { id: 'eco-kranti', name: 'Eco Kranti · Shubh Labh 1.0 (Bharat Startup Challenge 2026)', region: 'india', type: 'cyclical',
+    value: 'Grant + ecosystem access (varies by track)', domain: 'Single-use plastics elimination, sustainable materials, circular economy, waste management',
+    eligibility: 'Indian startups in green / circular economy categories',
+    url: 'https://www.startupgrantsindia.com/',
+    notes: 'NEW (2026). Directly named sub-themes include single-use plastic elimination + sustainable materials — perfect Bambrew fit.' },
+
+  { id: 'nsrcel-circular', name: 'NSRCEL · Circular Bharat Accelerator', region: 'india', type: 'cyclical',
+    value: 'Accelerator + pilot opportunities + go-to-market support', domain: 'Circular economy startups; pilot & scale-up focus',
+    eligibility: 'Indian circular-economy ventures',
+    url: 'https://nsrcel.org/circular-bharat-accelerator/',
+    notes: 'Multi-stakeholder: NSRCEL (IIM-B) + HUL + NITI Aayog + Xynteo. Strong on pilot opportunities — HUL connection makes this a customer-acquisition channel as well.' },
+
+  { id: 'zayed', name: 'Zayed Sustainability Prize', region: 'global', type: 'cyclical',
+    value: 'USD 1 million per category', domain: 'Sustainability innovation — Food, Health, Energy, Water, Climate Action categories',
+    eligibility: 'Globally open. SMEs, NGOs, and high schools.',
+    url: 'https://www.zayedsustainabilityprize.com/',
+    launch: '2026-09-01', deadline: '2026-12-15',
+    notes: 'Singapore\'s N&E Innovations won USD 1M in 2026 Food category for biodegradable food packaging — proves the fit. Annual nomination cycle Sept–Dec.' },
+
+  { id: 'tata-prize', name: 'Tata Transformation Prize (via NYAS)', region: 'global', type: 'cyclical',
+    value: 'Recognition + funding (varies by category)', domain: 'Sustainable agriculture, food security, environmental solutions',
+    eligibility: 'India-based scientists / institutions',
+    url: 'https://www.nyas.org/program-category/tata/',
+    notes: 'Recognition prize + financial support. Hosted by New York Academy of Sciences with Tata backing.' },
+
+  { id: 'gef-9', name: 'Global Environment Facility (GEF-9 cycle)', region: 'multilateral', type: 'rolling',
+    value: 'USD 7.7B+ replenishment pool (project-specific allocations)', domain: 'Climate change, land degradation, biodiversity, chemicals & waste',
+    eligibility: 'India is UNFCCC-eligible. Access via accredited Implementing Agencies (UNDP / UNEP / World Bank) or via NABARD as Direct Access Entity.',
+    url: 'https://www.thegef.org/projects-operations/country-profiles/india',
+    notes: 'GEF-9 runs July 2026 → June 2030. Focus on integrated programming + blended finance. Bambrew engages via in-country implementing agency.' },
+
+  { id: 'polymer-coe', name: 'Centre of Excellence Grant for Polymer Research', region: 'india', type: 'cyclical',
+    value: 'Up to ₹5 cr', domain: 'Polymer research including biopolymers',
+    eligibility: 'Indian R&D / startup ventures with polymer focus',
+    url: 'https://www.entrepreneurindia.co/blogs/polymer-startup-funding-india/',
+    notes: 'Direct R&D fit. Bambrew can apply for biopolymer-specific work (process optimisation, new grades, etc.).' },
+
+  { id: 'csir-comm', name: 'CSIR Tech Commercialisation Schemes (NMITLI / SETU / ASPIRE)', region: 'india', type: 'rolling',
+    value: 'Grant + Equity + Debt blend (varies)', domain: 'Tech commercialisation by startups & SMEs',
+    eligibility: 'Indian startups commercialising research/tech',
+    url: 'https://www.csir.res.in/en/rd-projects-csir',
+    notes: 'CSIR publicly-funded commercialisation schemes — useful for moving biopolymer R&D to manufacturing scale.' },
+
+  { id: 'airasia', name: 'AirAsia Foundation Grant 2026', region: 'global', type: 'cyclical',
+    value: 'Up to USD 25,000', domain: 'Sustainable travel, climate resilience, community-driven solutions',
+    eligibility: 'ASEAN-based or ASEAN-led social enterprises (requires regional entity)',
+    url: 'https://www2.fundsforngos.org/community-development/open-call-grants-to-support-asean-changemakers/',
+    notes: 'Low ticket. Only viable if Bambrew sets up ASEAN entity or has ASEAN-registered co-applicant.' }
+];
+
+// ============================================================
+// WHAT'S NEW — auto-refreshed by ~/bambrew-news-refresher/refresh.py
+// ============================================================
+// __NEWS_START__
+const LAST_REFRESH = '2026-06-10 12:56';
+const NEWS = [
+  { date: '2026-06-09', title: 'SOMS 2026 to Showcase Opportunities in Specialty Fertilizers at Gandhinagar - Global Agriculture', grantId: null, significance: 'Auto-fetched · Keyword: sustainable packaging India funding 2026', source: 'Global Agriculture', url: 'https://news.google.com/rss/articles/CBMiwgFBVV95cUxQa19lemZhUFV0cnI0TjU3aU1ROHdxblNKa1JaRXUtWmZiOXQ5YkN4Y1pZZUJ2N19vRWxfeWR0TUYtX2lhS0R0T3Z2TGFNTFJIcS05MEFwQy1saDVXTm93a3JZclVyVFNXM2tyNThwa01sQnFOaFNRbkhlZ1Z4dzNLUkswdEtlNTFMRHNDTk9uZ2F4VDlwRWJOVjhhY1lnaWU0YjdxNUJVQTZqNVZNemt5bnlzNkh6VWxNZi04bC1tbDRFQQ?oc=5', isLikelyGrant: false },
+  { date: '2026-06-09', title: 'Is Your Baby’s Food Full of Microplastics? - journal.com.ph', grantId: null, significance: 'Auto-fetched · Keyword: "phase out plastic" packaging brand', source: 'journal.com.ph', url: 'https://news.google.com/rss/articles/CBMiakFVX3lxTE1LSkRDY1U4WEdvVzd3SGk4LUlLRElsSTR3bWhEUlFKYi1DWk1ERFRVdFVTSDNOZXV2T1lQaEtUc1c4S1ZrRS1pSXl2NHNLZ0tDdF8wa3pxXzN4VW1mWTZNVzlDSUd3ZjJzMXc?oc=5', isLikelyGrant: false },
+  { date: '2026-06-09', title: 'Innovation, Research & Smart Cities: Mid-June Update (9 new opportunities!) - Substack', grantId: null, significance: 'Auto-fetched · Keyword: "TDB" "India-Finland" 2026', source: 'Substack', url: 'https://news.google.com/rss/articles/CBMigwFBVV95cUxQWUVIbnpfMDIyT0pLemM5VHROLVBYc2dON1ludS1TOGEtTDhXb3JHakJOcW1vWlNpWHpoSjlTU3pqQmZIOEZOamtNdFFKaV9wTUJJQWFaZDFxT2pUU08xTlFkLVQ2M2Q0LUNsVWVpRGlSRmRxTGdhOUt6dkRtNFM4T1VKNA?oc=5', isLikelyGrant: false },
+  { date: '2026-06-08', title: 'Inside information: Betolar has been granted €2.1 million in funding under the EU LIFE programme for the MINERVA project - BeBeez International', grantId: 'life', significance: 'Auto-fetched · Keyword: "EU LIFE Programme" circular economy 2026', source: 'BeBeez International', url: 'https://news.google.com/rss/articles/CBMi4wFBVV95cUxPRnZmVzdMUjV0akZrTXBmdVN5YmVQWjNCYVY1V19tNTZPR2NrRDhSdnBvdXVPNjZuTG9RSF85OWQwSmU5TDJITmVHdTdzYnFBcDdiTWI2aG1pb2p3T2NSYnlRZVgwZkZvZnRnN0JhT0pxcnlKSlRMYS1LZ1lUaDd0dDRUSXdfR3VEaW5ZSU5CME1CZnJuc3lNZk9ELWtCNnh6MzNoSVFjUUpWUTJkdnBVN3cwOUJ5U3doRGYzYVRmb1JWSFl0MUgxbGJjOXVWUVJvb2NFOUtQTThRMWtSN09SMjJDOA?oc=5', isLikelyGrant: false },
+  { date: '2026-06-08', title: 'Greendot Biopak Pioneers Worlds Premium Home Compostable Stretch Film, Closing the Last Major Gap in Packaging Sustainability - The Tribune', grantId: null, significance: 'Auto-fetched · Keyword: "compostable packaging" India', source: 'The Tribune', url: 'https://news.google.com/rss/articles/CBMinAJBVV95cUxQZS0zVTNnOTltd25aclpFYTZJWGRBUzBYSUk3ZEcwbGNWRDh2ZEVZdFNCUUxkdUtnRTh2a2xuQ0hDRUZkR21adWJLMThoRldsQmt5UGNNcThsdUZUUWR4SXpZNHU0LUJkQzhoYnYzak9nNmJVdjNvOE01RHBJOE94ZFRpaHdPUkhRdGRBYjU1eGpUTnE2MVo1TVhGWEVRUjdkd3FqeGc5VzI0cXUxLWhueDEwa2ltWllBbnRfWU5RYTBpV1IxQkxUVTh1YjA2ZW9zOVBDczRlWnNiVlAtY0p3VUU0UjJ2UGxTRmprRHlqOVZqSzNMYjlzSUVZWF9hSkJoRmlkN3JvWU5NUUhwanZMNVNDQTRreXYyS20zXw?oc=5', isLikelyGrant: false },
+  { date: '2026-06-06', title: 'World Biopolymer Films - Market Analysis, Forecast, Size, Trends and Insights - IndexBox', grantId: null, significance: 'Auto-fetched · Keyword: biopolymer packaging India', source: 'IndexBox', url: 'https://news.google.com/rss/articles/CBMi0wFBVV95cUxQY2JtYTlSM3ZOdU1sMUozRWZEZDFtWll2bmYwbXlHcHROaFNaaGhPak5tMmlHbHV5UWVnakQwSVcxaUU1S2V4NEU5czV5b1FCREdZOTdlOTY1ZkxvQVZzWW9kLVJrTXpxU2VGRzlOaTNzTnFCLTM0ZXhvY0o1dWNud3RQY2dscUVCSWt0Y1B6LXlmSkNQRUxLczZRNDB6MXVJRkxpNWZ4cFp5T0hZQllvRktJSlVWZldUQ2I0MW5lY3pVem9veHpVM0pxeUVvbGNwaEhJ?oc=5', isLikelyGrant: false },
+  { date: '2026-06-05', title: 'Will ensure ban on single-use plastic, promise ministers - The Times of India', grantId: null, significance: 'Auto-fetched · Keyword: "single-use plastic" ban India 2026', source: 'The Times of India', url: 'https://news.google.com/rss/articles/CBMiygFBVV95cUxONkJMOHRxbzBhc1RTZ2VkOEVoNFFkWk02VUszZk5MM0MyNm1GTGNad0xMWDJPcHZFbS0xY1QyMzBhNGw2bTktUzBnNTdRYWxMQ2s0VG00aW5NMGpGcWNaSlBHRHI4X1ZWbEFYbFJjemtqREx5RnM5QjhqbDRtZVhINnZKbUdBTW9Tb0pjMUY2VjIyMU5TTk80cnZYZU5uZ1BPbHB6Vko0b3ZFY3A4aVZjV0VhVk5NOWpET2RjY3IxbHYzeUxJaWNIMmNB0gHPAUFVX3lxTE1mb1RuZnBlM2R6dlF6UnFzX19jYmpKNzRjTEs4djFsTHpKa0ptaWlmYXFCLWhZRDhiZklEOS1Ea1o2dmVQclZGSWhIQ3R0RHQtckFYZ2t3NXRhclU5MXJXNDVhTmc2M3hBTEN6UFlPaTdUVXhDRThfS08yVHJRWlo3cVpGVTRDNkVjLWdYWm5mT1dUUkxnWDlqWS1GTDVNNFJCYjdiV3A1Rk5XeGN4RDFZeUxpZk1fS1NMb2M4Z2RmZWhuLXg0bE9XVk03aGpGTQ?oc=5', isLikelyGrant: false },
+  { date: '2026-06-05', title: 'Chemco Receives FSSAI Approval for Food-Grade rPET, Strengthening India’s Circular Packaging Ecosystem - ChemAnalyst', grantId: null, significance: 'Auto-fetched · Keyword: "circular packaging" India brand', source: 'ChemAnalyst', url: 'https://news.google.com/rss/articles/CBMirgFBVV95cUxQeFE4SVlQMUdlbkQ2SG45RXBFNXlEa1g2clEtYWp4Zk9HLWJkSVBiT2RVVUJlRFlubVNEUU1HNWF3RTRYVnhVRHZhc1BfVFhOS1JLdkhsdWZQdHpGSnFKUnVFYWVpMU9FYjcyU1h2RWVnMTFsZmxxMWFFb2VHVTRleVJUQ29BVkNhU2M2a1RqT2lGY2o3R1BMdHF1RW52ci1GNHF0UjNhZ1lhTVpBS1E?oc=5', isLikelyGrant: false },
+  { date: '2026-06-05', title: 'World Environment Day: Companies move beyond net zero to build circular, resilient businesses - ET Auto', grantId: null, significance: 'Auto-fetched · Keyword: "net zero" packaging India', source: 'ET Auto', url: 'https://news.google.com/rss/articles/CBMi4wFBVV95cUxNTnpzWUNVVW5xUThwckkwVUkwNUJJY1VQcHI0bW94NzlaWHVudXpIMml4OUFuLUpKUGdKVXhUcHgxbXp3Zm9aczFxQmtsOFdidWtHTWV0SW1Ma2J6cDJXUFM2Q0tsaE1Lck1BQ1RNem9lZk14RWVNUUFzNEtUQzRISm44Mkt5a1ZiNFpxazBfV21sWEtLa0hWOXhWTXc5Y211WUNkck1PS1NWUU1xY3A3M0tIbWQxNFFmR2RGVGtHWlhHdGVtWEpKOFkwb2xqbnZPd1ZzYVlpVld4amNVdFJRWDFSbw?oc=5', isLikelyGrant: false },
+  { date: '2026-06-05', title: '⁠World Environment Day 2026: This was the 1st Indian state to ban plastic bags - Firstpost', grantId: null, significance: 'Auto-fetched · Keyword: "single-use plastic" ban India 2026', source: 'Firstpost', url: 'https://news.google.com/rss/articles/CBMixAFBVV95cUxQNEpkWFhmS2JJYkRfOW16bkhKeE9veXpvNW13U1ZOYktjQW9IMkdmb3p2NkRfU2FZZC1wcl9ibnlJVlhVQ0VwUlhEQ3RZN2FsRzFHcGdIYWRoSTd6MEdWWUZmbHNZUVhVdUQ2NkNJQy1PLW1QengzUjhMQy1RMTFvaml4QzZFMHozMGp6MWtuZEs2aDdhMWVtWVItOVpjeWc1YWMyUUlYVnZ3WnRGYm9wOWR6T29PZ2NPTDBtOGZjY2lHcF9R0gHKAUFVX3lxTE5tTDE5TktsR0g5X0o3MTVjNmFuTjA4ZThjVjBzZFhjVGRZUWl3TzdHMXNiaGJhTjFKSjVWYkdyWnR3dDFaU3kzRTRXWU9XTjd5dVlJT2tVMWI3MnFzREkwUEgwaWdtM1BwRl9fbDJSWm1DbmV3MGNGQXJYNE13VW83X1FCdUFtUzlncjZiUWJaMllBanpCa0Vpb3BtRGQzQlE0dExoQ3JURGZOaV9GbzZYVDh0Qzk5UW9YT3dsbkw3d3JWczVMRGo0X0E?oc=5', isLikelyGrant: false },
+  { date: '2026-06-05', title: 'EU-funded LIFE Awards 2026 spotlight nature, climate solutions - The Brussels Times', grantId: 'life', significance: 'Auto-fetched · Keyword: "EU LIFE Programme" circular economy 2026', source: 'The Brussels Times', url: 'https://news.google.com/rss/articles/CBMirwFBVV95cUxPTy15Ni16bE43N0FMY0laRWFIT3l6THFhTWNnajdwTHBqT2FwSXd5SUd1bVgtUEdFSjRpSFF3Z2hlNXFJMm9kcGVpeG4yTW80NFRlVHFzaWcxWHM1WFY2RFR6S09wM0dPTU1jWmFIWnluZG1TdHZDZThjREExRHVWeXRwVzRnejRFZTFfRUtUdWFiQnBOZC1SOFZOR3E3VHFuT1JoeTlCdnpxOHk2eHJ3?oc=5', isLikelyGrant: true },
+  { date: '2026-06-04', title: 'Chemco secures FSSAI nod for food-grade rPET bolstering India\'s circular packaging push - Indian Chemical News', grantId: null, significance: 'Auto-fetched · Keyword: "circular packaging" India brand', source: 'Indian Chemical News', url: 'https://news.google.com/rss/articles/CBMi0wFBVV95cUxPdDJCQjk2M0YyWmI5M0RIeFFIckx3VDZzRVc1R1NtSW90WW5tTHJRTnIzQlJXXzk3dl9faFJPRXR2bmZOT01Ddld2WHhHRkJhY2VyNy1YVm02NFN4SEtQVXJLZVJQMkdiQTVwamxhODQ2TGhzN3VEWko0TmN1WmdGb1VVLTBmeGgzSl9JVHZmWm5RWTA5ZVNBMUdQSksxM29PRmNscWFUSXNIZ1lHT0ItY2xQdk5mdlloOElNV3djSjdSZUI5ZWNaMVd6VlZNZHZ2b3RZ0gHaAUFVX3lxTE83TDhCQXdfNFJmMEFMb2NJNzFfcGxPYkxoRi1IMmlSS0tscWFIekpXblNTeTNBN29OWnZoSGRYOVJteHdvRGZ0bEJlalZjQUdWUTNrcXJNWDUyUmFmdnNXNkNoc1F3YU9kWUp5a1YxVWpENjA4NkRMeDJCZ09WS05qSGFYU2dxX3lIWVpVenp4Z2I4ZGdhRHVzNHFJLTlnUC1JakZMZ010dmxHVFZCM0RQRXdaNEozVlNjZXNwWTNaaXNHVUQ4UGlOTlRfM0lCUVkzQUxsR0cyMExR?oc=5', isLikelyGrant: false },
+];
+// __AUTO_GRANTS_START__
+const AUTO_DISCOVERED_GRANTS = [
+  { id: 'auto-61505944', name: 'EU-PH Green Economy Partnership SO2 Green LGUs 2026 Circular Solutions CSO Grants', region: 'multilateral', type: 'deadline', value: 'See source', domain: 'Auto-detected from news headline', eligibility: 'Visit source link to verify eligibility', url: 'https://news.google.com/rss/articles/CBMiyAFBVV95cUxNV2N5SXR5eDZMMjFiV2pwNDAzZDdvMW02YVI1UFpOM0NBS1hITnNYYnVrNUYtODJrQjVqWVY5OWluNlNoTlVDMDEzT3k0NlVFRzZCRjdubVh3TUFaUGZmMm5pVGRIcEo3UVRYQ0trVDV0ZEIyYUdNZWNvVEpxM19sUDlpTTBKbml0R1hvQ1NJTkh2STdLQUdNbGphV045MW5UdnlGVWQxd2o1b3BBTjNodHBMU3FxSDA3a2tKR0MzdDV1aE1zVDZ3dw?oc=5', notes: 'Auto-discovered from news on 2026-06-10 · keyword: India circular economy grant 2026', discoveredOn: '2026-06-10', autoDiscovered: true },
+  { id: 'auto-71260969', name: 'Agriculture, Climate, Environment, Energy & Food: June 2026 Funding Opportunities (50 new opportunities!)', region: 'global', type: 'deadline', value: 'See source', domain: 'Auto-detected from news headline', eligibility: 'Visit source link to verify eligibility', url: 'https://news.google.com/rss/articles/CBMihgFBVV95cUxPcThTNmhodVBMcmhROHRaamZlVk9vSE1sTGRkZFJyZ3BGZ2VTWjhFaFVZRmpkSjhMbDV5dFFhMEU2SDN3blpNWW42eHJVUzhZMS10WjdObFVoN3JuQ19UcDY1blZQUFJKbzhIUTI3OXNnamFkb05OWjBhYkMxNzV6cXZfYlVvQQ?oc=5', notes: 'Auto-discovered from news on 2026-06-10 · keyword: India circular economy grant 2026', discoveredOn: '2026-06-10', autoDiscovered: true },
+  { id: 'auto-88073708', name: 'EU-funded initiative launches knowledge platform to advance circular economy in Europe', region: 'eu', type: 'deadline', value: 'See source', domain: 'Auto-detected from news headline', eligibility: 'Visit source link to verify eligibility', url: 'https://news.google.com/rss/articles/CBMizgFBVV95cUxOdmVBWWRNeWVOLUVYeTB4Tld1S21ObTBqX0c2S05zWE9CVXp3OE96QUllSm9waXJsUmFqSEd2VGN1T0VzLXh5M0h0cmgyXzUySmpsd1E2NnJqTThXZjVPVWJXV0ZxUUU1bXhmNlRZdGFISFJpUjFHZXNLNHV3blpiWUpCT2gxMHhpNzJxaXVVbThkbDNIdGYyb19UVk52X05BYTJSbVJnLVZ0WlEwMjN2ZFlNQ1BNWW1xTVNFdDBrN0tqME9Vc0dFcGs4RVY3QQ?oc=5', notes: 'Auto-discovered from news on 2026-06-10 · keyword: "Horizon Europe" circular packaging', discoveredOn: '2026-06-10', autoDiscovered: true },
+];
+// __AUTO_GRANTS_END__
+// __NEWS_END__
+
+// ============================================================
+// KEYWORD GROUPS — for one-click news refresh
+// ============================================================
+const KEYWORD_GROUPS = [
+  { label: 'Bambrew + materials',
+    keywords: ['Bambrew', 'biopolymer packaging India', 'PBAT compostable India', 'PLA biodegradable India'] },
+  { label: 'India grant bodies',
+    keywords: ['BIRAC BioE3 2026', 'DBT BIRAC call', 'NABARD climate fund 2026', 'NITI Aayog AIM circular economy', 'ELEVATE Karnataka 2026', 'C-CAMP sustainability'] },
+  { label: 'International programmes',
+    keywords: ['CBE JU 2026 films coatings', 'EU LIFE Programme 2026 circular', 'Innovate UK SSPP', 'IKEA Foundation India grant', 'Bezos Earth Fund biopolymer', 'Earthshot Prize 2027', 'Green Climate Fund India'] },
+  { label: 'Sector + regulation',
+    keywords: ['India plastic waste management rules 2026', 'India circular economy grant', 'sustainable packaging India funding', 'compostable packaging startup India'] }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const STATUS_LABELS = {
+  'not-started': 'Not Started',
+  'in-progress': 'In Progress',
+  'submitted':   'Submitted',
+  'won':         'Won',
+  'lost':        'Lost',
+  'skipped':     'Skipped'
+};
+
+const REGION_LABELS = {
+  india: 'India', eu: 'EU', uk: 'UK', multilateral: 'Multilateral', global: 'Global / Corp'
+};
+
+const TYPE_LABELS = {
+  deadline: 'Deadline', cyclical: 'Cyclical', rolling: 'Rolling'
+};
+
+let userState  = JSON.parse(localStorage.getItem('bambrew-grants') || '{}');
+let userGrants = JSON.parse(localStorage.getItem('bambrew-user-grants') || '[]');
+let dismissedAutoIds = JSON.parse(localStorage.getItem('bambrew-dismissed-auto') || '[]');
+let currentView = 'list';
+
+function saveUserGrants() { localStorage.setItem('bambrew-user-grants', JSON.stringify(userGrants)); }
+function saveDismissed() { localStorage.setItem('bambrew-dismissed-auto', JSON.stringify(dismissedAutoIds)); }
+
+function autoGrants() {
+  if (typeof AUTO_DISCOVERED_GRANTS === 'undefined') return [];
+  // hide ones the user dismissed, and ones older than 30 days
+  return AUTO_DISCOVERED_GRANTS.filter(g => {
+    if (dismissedAutoIds.includes(g.id)) return false;
+    if (g.discoveredOn) {
+      const ageDays = daysBetween(new Date(g.discoveredOn), TODAY);
+      if (ageDays > 30) return false;
+    }
+    return true;
+  });
+}
+
+function allGrants() { return GRANTS.concat(userGrants).concat(autoGrants()); }
+function isUserAdded(id) { return userGrants.some(g => g.id === id); }
+function isAutoDiscovered(id) { return autoGrants().some(g => g.id === id); }
+function removeUserGrant(id) {
+  if (!confirm('Remove this user-added grant? This cannot be undone.')) return;
+  userGrants = userGrants.filter(g => g.id !== id);
+  saveUserGrants();
+  render();
+}
+function dismissAutoGrant(id) {
+  dismissedAutoIds.push(id);
+  saveDismissed();
+  render();
+}
+function promoteAutoGrant(id) {
+  const g = autoGrants().find(x => x.id === id);
+  if (!g) return;
+  // copy into userGrants permanently and dismiss from auto-discovered
+  userGrants.push(Object.assign({}, g, { autoDiscovered: false, promotedOn: new Date().toISOString() }));
+  dismissedAutoIds.push(id);
+  saveUserGrants();
+  saveDismissed();
+  render();
+}
+let calendarDate = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })(); // opens to current month
+
+function saveState() {
+  localStorage.setItem('bambrew-grants', JSON.stringify(userState));
+}
+function getStatus(id)  { return (userState[id] && userState[id].status) || 'not-started'; }
+function getNotes(id)   { return (userState[id] && userState[id].notes) || ''; }
+function getChecked(id) { return userState[id] && userState[id].lastChecked ? new Date(userState[id].lastChecked) : null; }
+function setStatus(id, v) {
+  userState[id] = userState[id] || {};
+  userState[id].status = v;
+  saveState();
+  render();
+}
+function setNotes(id, v) {
+  userState[id] = userState[id] || {};
+  userState[id].notes = v;
+  saveState();
+  renderTiles();
+}
+function verifyGrant(id) {
+  userState[id] = userState[id] || {};
+  userState[id].lastChecked = new Date().toISOString();
+  saveState();
+  render();
+}
+function freshnessPill(id) {
+  const last = getChecked(id);
+  if (!last) return '';
+  const days = daysBetween(last, TODAY);
+  const stamp = last.toLocaleDateString('en-IN', { day:'2-digit', month:'short' });
+  if (days <= 7)       return `<span class="freshness freshness-fresh">Checked ${days}d ago · ${stamp}</span>`;
+  if (days <= 30)      return `<span class="freshness freshness-aging">Checked ${days}d ago · ${stamp}</span>`;
+  return `<span class="freshness freshness-stale">Stale · ${days}d ago · ${stamp}</span>`;
+}
+function newsSearchUrl(grantName) {
+  return 'https://news.google.com/search?q=' + encodeURIComponent(grantName + ' 2026') + '&hl=en-IN';
+}
+function googleSearchUrl(grantName) {
+  return 'https://www.google.com/search?q=' + encodeURIComponent('"' + grantName + '" 2026 deadline');
+}
+
+// ============================================================
+// DATE HELPERS
+// ============================================================
+const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })(); // auto-detects today's date in your browser
+function daysBetween(d1, d2) {
+  return Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+}
+function fmtDate(s) {
+  if (!s) return '—';
+  const d = new Date(s);
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+// ============================================================
+// VIEW SWITCHING
+// ============================================================
+function setView(v) {
+  currentView = v;
+  document.getElementById('btn-list').classList.toggle('active', v === 'list');
+  document.getElementById('btn-calendar').classList.toggle('active', v === 'calendar');
+  document.getElementById('view-list').classList.toggle('active', v === 'list');
+  document.getElementById('view-calendar').classList.toggle('active', v === 'calendar');
+  render();
+}
+
+// ============================================================
+// FILTERING / SORTING
+// ============================================================
+let showPastDeadlines = false; // toggled by the "Show past-deadline grants" link
+
+function filtered() {
+  const s = document.getElementById('filter-status').value;
+  const r = document.getElementById('filter-region').value;
+  const t = document.getElementById('filter-type').value;
+  const sort = document.getElementById('sort-by').value;
+
+  let out = allGrants().filter(g => {
+    if (s && getStatus(g.id) !== s) return false;
+    if (r && g.region !== r) return false;
+    if (t && g.type !== t) return false;
+    // Auto-hide grants whose deadline is in the past — unless the user has
+    // already submitted/won them (in which case they're worth keeping visible).
+    if (!showPastDeadlines && g.deadline) {
+      const d = daysBetween(TODAY, new Date(g.deadline));
+      const st = getStatus(g.id);
+      const keepRegardless = ['submitted', 'won', 'lost'].includes(st);
+      if (d < 0 && !keepRegardless) return false;
+    }
+    return true;
+  });
+
+  out.sort((a, b) => {
+    if (sort === 'name') return a.name.localeCompare(b.name);
+    if (sort === 'value') return a.value.localeCompare(b.value);
+    if (sort === 'status') return getStatus(a.id).localeCompare(getStatus(b.id));
+    // deadline default: items with deadline come first, sorted ascending; then rolling/cyclical
+    const ad = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+    const bd = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+    return ad - bd;
+  });
+
+  return out;
+}
+
+// ============================================================
+// SUMMARY TILES
+// ============================================================
+function renderTiles() {
+  const total = allGrants().length;
+  let upcoming30 = 0, upcoming60 = 0, upcoming90 = 0, inProgress = 0, stale = 0;
+  allGrants().forEach(g => {
+    if (g.deadline) {
+      const d = daysBetween(TODAY, new Date(g.deadline));
+      if (d >= 0 && d <= 30) upcoming30++;
+      if (d >= 0 && d <= 60) upcoming60++;
+      if (d >= 0 && d <= 90) upcoming90++;
+    }
+    const st = getStatus(g.id);
+    if (st === 'in-progress') inProgress++;
+    const last = getChecked(g.id);
+    if (!last || daysBetween(last, TODAY) > 30) stale++;
+  });
+
+  document.getElementById('tiles').innerHTML = `
+    <div class="tile">
+      <div class="label">Total tracked</div>
+      <div class="value">${total}</div>
+      <div class="sub">across India, EU, UK, multilateral & global</div>
+    </div>
+    <div class="tile alert clickable" onclick="openDeadlineModal(30)" title="Click to see all grants closing in ≤30 days">
+      <div class="label">Closing in ≤30 days</div>
+      <div class="value">${upcoming30}</div>
+      <div class="sub">click to view list →</div>
+    </div>
+    <div class="tile amber clickable" onclick="openDeadlineModal(60)" title="Click to see all grants closing in ≤60 days">
+      <div class="label">Closing in ≤60 days</div>
+      <div class="value">${upcoming60}</div>
+      <div class="sub">click to view list →</div>
+    </div>
+    <div class="tile active clickable" onclick="openDeadlineModal(90)" title="Click to see all grants closing in ≤90 days">
+      <div class="label">Closing in ≤90 days</div>
+      <div class="value">${upcoming90}</div>
+      <div class="sub">click to view list →</div>
+    </div>
+    <div class="tile amber">
+      <div class="label">Stale · need re-check</div>
+      <div class="value">${stale}</div>
+      <div class="sub">unverified in 30+ days</div>
+    </div>
+    <div class="tile amber">
+      <div class="label">In progress</div>
+      <div class="value">${inProgress}</div>
+      <div class="sub">being prepared</div>
+    </div>`;
+}
+
+function openDeadlineModal(maxDays) {
+  const matching = allGrants().filter(g => {
+    if (!g.deadline) return false;
+    const d = daysBetween(TODAY, new Date(g.deadline));
+    return d >= 0 && d <= maxDays;
+  }).sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+
+  const title = `Grants closing in ≤${maxDays} days`;
+  let body = `<h3>${title}</h3>
+    <div class="meta-row">${matching.length} grant${matching.length === 1 ? '' : 's'} match · sorted by deadline (soonest first)</div>`;
+
+  if (matching.length === 0) {
+    body += `<p style="color:#6b7680; padding: 14px 0;">No grants closing in this window. Breathe.</p>`;
+  } else {
+    body += '<div style="margin-top: 8px;">';
+    matching.forEach(g => {
+      const d = daysBetween(TODAY, new Date(g.deadline));
+      const dClass = d <= 14 ? 'days-critical' : d <= 45 ? 'days-urgent' : 'days-comfortable';
+      const st = getStatus(g.id);
+      body += `
+        <div style="border-left: 3px solid #2a8f5e; background: #fafbfa; padding: 9px 12px; margin-bottom: 7px; border-radius: 4px; cursor: pointer;"
+             onclick="closeModal(); openModal('${g.id}');"
+             title="Click for full grant details">
+          <div style="font-weight: 700; color: #0f2a1e; font-size: 12.5px;">${g.name}</div>
+          <div style="font-size: 11px; color: #57636d; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+            <span class="pill pill-${g.region}">${REGION_LABELS[g.region]}</span>
+            <span class="type-pill type-${g.type}">${TYPE_LABELS[g.type]}</span>
+            <span>${g.value}</span>
+            <span>· closes ${fmtDate(g.deadline)}</span>
+            <span class="days-left ${dClass}">${d}d left</span>
+            <span class="status-${st}" style="font-size:9.5px; padding: 1px 7px; border-radius:8px; font-weight:700;">${STATUS_LABELS[st]}</span>
+          </div>
+        </div>`;
+    });
+    body += '</div>';
+  }
+  body += `<button class="modal-close" onclick="closeModal()">Close</button>`;
+
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+// ============================================================
+// LIST VIEW
+// ============================================================
+function renderList() {
+  const tbody = document.getElementById('grants-tbody');
+  const rows = filtered();
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:#6b7680;">No grants match these filters.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(g => {
+    let daysCell = '';
+    if (g.deadline) {
+      const d = daysBetween(TODAY, new Date(g.deadline));
+      if (d < 0) daysCell = `<span class="days-left days-passed">Past</span>`;
+      else if (d <= 14) daysCell = `<span class="days-left days-critical">${d}d</span>`;
+      else if (d <= 45) daysCell = `<span class="days-left days-urgent">${d}d</span>`;
+      else daysCell = `<span class="days-left days-comfortable">${d}d</span>`;
+    } else {
+      daysCell = `<span class="days-left days-rolling">—</span>`;
+    }
+
+    const cycleLabel = g.deadline ? fmtDate(g.deadline) : (g.type === 'rolling' ? 'Rolling' : 'Cyclical');
+
+    const st = getStatus(g.id);
+
+    const isAuto = g.autoDiscovered === true;
+    return `
+      <tr ${isAuto ? 'style="background:#fffaeb;"' : ''}>
+        <td class="grant-name">
+          <span style="cursor:pointer;" onclick="openModal('${g.id}')">${g.name}</span>
+          ${isAuto ? '<span class="grant-flag" style="margin-left:6px;">🤖 Auto-discovered · needs review</span>' : ''}
+          ${g.url ? `<a href="${g.url}" target="_blank">${g.url.replace('https://', '').replace('http://', '').replace(/\/+$/, '')}</a>` : ''}
+          <div class="quick-actions">
+            ${g.url ? `<a class="qa-btn" href="${g.url}" target="_blank" title="Open the grant's official website">🌐 Site</a>` : ''}
+            <a class="qa-btn" href="${newsSearchUrl(g.name)}" target="_blank" title="Search Google News for the latest mentions">🔍 News</a>
+            <a class="qa-btn" href="${googleSearchUrl(g.name)}" target="_blank" title="Google search for the grant + 2026 deadline">🔎 Web</a>
+            <button class="qa-btn verify" onclick="verifyGrant('${g.id}')" title="Mark as checked today">✓ Verify</button>
+            ${isAuto ? `<button class="qa-btn verify" onclick="promoteAutoGrant('${g.id}')" title="Confirm — move to permanent list">✓ Keep</button>` : ''}
+            ${isAuto ? `<button class="qa-btn" style="color:#842121;border-color:#fadcdc;" onclick="dismissAutoGrant('${g.id}')" title="Dismiss — not actually a grant">✗ Dismiss</button>` : ''}
+            ${isUserAdded(g.id) ? `<button class="qa-btn" style="color:#842121;border-color:#fadcdc;" onclick="removeUserGrant('${g.id}')" title="Remove this user-added grant">✗ Remove</button>` : ''}
+          </div>
+          ${freshnessPill(g.id)}
+        </td>
+        <td><span class="pill pill-${g.region}">${REGION_LABELS[g.region]}</span></td>
+        <td><span class="type-pill type-${g.type}">${TYPE_LABELS[g.type]}</span></td>
+        <td>${g.value}</td>
+        <td>${cycleLabel}</td>
+        <td>${daysCell}</td>
+        <td>
+          <select class="status-select status-${st}" onchange="setStatus('${g.id}', this.value)">
+            ${Object.entries(STATUS_LABELS).map(([k, lbl]) =>
+              `<option value="${k}" ${k===st?'selected':''}>${lbl}</option>`).join('')}
+          </select>
+        </td>
+        <td><textarea class="notes-input" placeholder="Add notes…" oninput="setNotes('${g.id}', this.value)">${getNotes(g.id)}</textarea></td>
+      </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// CALENDAR VIEW
+// ============================================================
+function renderCalendar() {
+  const title = calendarDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+  document.getElementById('cal-title').textContent = title;
+
+  const year = calendarDate.getFullYear();
+  const month = calendarDate.getMonth();
+  const first = new Date(year, month, 1);
+  const last  = new Date(year, month + 1, 0);
+  const startDayOfWeek = first.getDay();
+  const daysInMonth = last.getDate();
+
+  // collect events for this month
+  const events = {};
+  allGrants().forEach(g => {
+    [['launch', g.launch], ['deadline', g.deadline]].forEach(([kind, ds]) => {
+      if (!ds) return;
+      const d = new Date(ds);
+      if (d.getFullYear() === year && d.getMonth() === month) {
+        const day = d.getDate();
+        events[day] = events[day] || [];
+        events[day].push({ kind, grant: g });
+      }
+    });
+  });
+
+  // header (Sun-Sat)
+  const labels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = labels.map(l => `<div class="calendar-day-label">${l}</div>`).join('');
+
+  // leading blanks
+  const prevMonthLast = new Date(year, month, 0).getDate();
+  for (let i = startDayOfWeek - 1; i >= 0; i--) {
+    html += `<div class="calendar-cell outside"><div class="day-number">${prevMonthLast - i}</div></div>`;
+  }
+
+  // current month cells
+  for (let day = 1; day <= daysInMonth; day++) {
+    const isToday = year === TODAY.getFullYear() && month === TODAY.getMonth() && day === TODAY.getDate();
+    let cellHtml = `<div class="calendar-cell ${isToday ? 'today' : ''}"><div class="day-number">${day}</div>`;
+    if (events[day]) {
+      events[day].forEach(ev => {
+        const kindClass = ev.kind === 'deadline' ? 'deadline'
+                       : ev.kind === 'launch'   ? 'launch'
+                       : 'cyclical';
+        const kindLabel = ev.kind === 'deadline' ? '⚑ DEADLINE'
+                       : ev.kind === 'launch'   ? '▶ OPENS'
+                       : 'EVENT';
+        cellHtml += `<span class="event ${kindClass}" title="${ev.grant.name} — ${kindLabel}" onclick="openModal('${ev.grant.id}')">${kindLabel}: ${ev.grant.name}</span>`;
+      });
+    }
+    cellHtml += `</div>`;
+    html += cellHtml;
+  }
+
+  // trailing blanks
+  const totalCells = startDayOfWeek + daysInMonth;
+  const trailing = (7 - (totalCells % 7)) % 7;
+  for (let i = 1; i <= trailing; i++) {
+    html += `<div class="calendar-cell outside"><div class="day-number">${i}</div></div>`;
+  }
+
+  document.getElementById('calendar-grid').innerHTML = html;
+
+  // Rolling chips
+  const rolling = allGrants().filter(g => g.type === 'rolling' ||
+    (g.type === 'cyclical' && !g.deadline) ||
+    (g.deadline && !(new Date(g.deadline).getFullYear() === year && new Date(g.deadline).getMonth() === month)));
+  // narrow to just rolling for the strip
+  const rollingOnly = allGrants().filter(g => g.type === 'rolling');
+  document.getElementById('rolling-chips').innerHTML = rollingOnly.map(g =>
+    `<span class="rolling-chip" onclick="openModal('${g.id}')" style="cursor:pointer;">${g.name}</span>`
+  ).join('');
+}
+
+function navMonth(delta) {
+  calendarDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + delta, 1);
+  renderCalendar();
+}
+function goToday() {
+  calendarDate = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
+  renderCalendar();
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(id) {
+  const g = allGrants().find(x => x.id === id);
+  if (!g) return;
+  const dStr = g.deadline ? fmtDate(g.deadline) : (g.type === 'rolling' ? 'Rolling — no fixed deadline' : 'Cyclical');
+  let daysHtml = '';
+  if (g.deadline) {
+    const d = daysBetween(TODAY, new Date(g.deadline));
+    if (d < 0) daysHtml = `<span class="days-left days-passed">Past</span>`;
+    else daysHtml = `<span class="days-left ${d<=14?'days-critical':d<=45?'days-urgent':'days-comfortable'}">${d} days left</span>`;
+  } else {
+    daysHtml = `<span class="days-left days-rolling">${TYPE_LABELS[g.type]}</span>`;
+  }
+  document.getElementById('modal-body').innerHTML = `
+    <h3>${g.name}</h3>
+    <div class="meta-row">
+      <span class="pill pill-${g.region}">${REGION_LABELS[g.region]}</span>
+      <span class="type-pill type-${g.type}">${TYPE_LABELS[g.type]}</span>
+      ${daysHtml}
+    </div>
+    <div class="row"><div class="label-k">Value</div><div class="val">${g.value}</div></div>
+    <div class="row"><div class="label-k">Domain</div><div class="val">${g.domain}</div></div>
+    <div class="row"><div class="label-k">Eligibility</div><div class="val">${g.eligibility}</div></div>
+    ${g.launch ? `<div class="row"><div class="label-k">Launch / opens</div><div class="val">${fmtDate(g.launch)}</div></div>` : ''}
+    <div class="row"><div class="label-k">Deadline</div><div class="val">${dStr}</div></div>
+    <div class="row"><div class="label-k">Notes</div><div class="val">${g.notes}</div></div>
+    ${g.url ? `<div class="row"><div class="label-k">Website</div><div class="val"><a href="${g.url}" target="_blank">${g.url}</a></div></div>` : ''}
+    <button class="modal-close" onclick="closeModal()">Close</button>`;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
+
+// ============================================================
+// NEWS + KEYWORD PANEL
+// ============================================================
+function classifyNews(n) {
+  if (n.grantId === null && /Bambrew/i.test(n.title)) return 'own';
+  if (n.grantId === null && /(Rules|Amendment|regulation|Plastic Waste)/i.test(n.title)) return 'regulatory';
+  if (n.grantId === null && /(raises|Series|funding|invest)/i.test(n.title)) return 'competitive';
+  return '';
+}
+function renderNews() {
+  const body = document.getElementById('news-body');
+  const sorted = [...NEWS].sort((a,b) => new Date(b.date) - new Date(a.date));
+  body.innerHTML = sorted.map((n, idx) => {
+    const linkedGrant = n.grantId ? allGrants().find(g => g.id === n.grantId) : null;
+    return `
+      <div class="news-card ${classifyNews(n)}">
+        <div class="nc-date">${new Date(n.date).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}
+          ${n.isLikelyGrant ? '<span class="grant-flag">🎯 Looks like a grant</span>' : ''}
+        </div>
+        <h4 class="nc-title">${n.title}</h4>
+        <div class="nc-sig">${n.significance}</div>
+        <div class="nc-source">
+          Source: <a href="${n.url}" target="_blank">${n.source}</a>
+          ${linkedGrant ? `<button class="nc-link" onclick="openModal('${linkedGrant.id}')">↗ Open grant: ${linkedGrant.name}</button>` : ''}
+          ${n.isLikelyGrant && !linkedGrant ? `<button class="nc-add" onclick="openQuickAdd(${idx})">+ Add to my grants</button>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openQuickAdd(newsIdx) {
+  const sorted = [...NEWS].sort((a,b) => new Date(b.date) - new Date(a.date));
+  const n = sorted[newsIdx];
+  if (!n) return;
+  const slug = 'usr-' + Date.now();
+  document.getElementById('modal-body').innerHTML = `
+    <h3>+ Add as a tracked grant</h3>
+    <div class="meta-row">Pre-filled from the news headline. Edit anything before saving.</div>
+    <div class="row"><div class="label-k">Grant name</div>
+      <input id="qa-name" class="qa-input" value="${(n.title || '').replace(/"/g, '&quot;').replace(/ - [^-]+$/, '')}"></div>
+    <div class="row"><div class="label-k">Website / URL</div>
+      <input id="qa-url" class="qa-input" value="${n.url}"></div>
+    <div class="row"><div class="label-k">Region</div>
+      <select id="qa-region" class="qa-input">
+        <option value="india">India</option>
+        <option value="eu">EU</option>
+        <option value="uk">UK</option>
+        <option value="multilateral">Multilateral</option>
+        <option value="global" selected>Global / Corporate</option>
+      </select></div>
+    <div class="row"><div class="label-k">Type</div>
+      <select id="qa-type" class="qa-input">
+        <option value="deadline">Fixed Deadline</option>
+        <option value="cyclical">Cyclical</option>
+        <option value="rolling" selected>Rolling</option>
+      </select></div>
+    <div class="row"><div class="label-k">Value (e.g. ₹50 lakh, USD 100K, varies)</div>
+      <input id="qa-value" class="qa-input" placeholder="Varies"></div>
+    <div class="row"><div class="label-k">Deadline (YYYY-MM-DD; leave blank if rolling)</div>
+      <input id="qa-deadline" class="qa-input" type="date"></div>
+    <div class="row"><div class="label-k">Domain</div>
+      <input id="qa-domain" class="qa-input" placeholder="Sustainability / circular packaging / climate"></div>
+    <div class="row"><div class="label-k">Eligibility / notes (one line)</div>
+      <input id="qa-notes" class="qa-input" placeholder="Who can apply, key requirements"></div>
+    <button class="modal-close" style="background:#2a8f5e;" onclick="saveQuickAdd('${slug}', '${n.url.replace(/'/g, "\\'")}')">Save grant</button>
+    <button class="modal-close" onclick="closeModal()" style="margin-left:8px;">Cancel</button>`;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function saveQuickAdd(slug, url) {
+  const name = document.getElementById('qa-name').value.trim();
+  if (!name) { alert('Grant name is required'); return; }
+  const newGrant = {
+    id: slug,
+    name: name,
+    region: document.getElementById('qa-region').value,
+    type: document.getElementById('qa-type').value,
+    value: document.getElementById('qa-value').value.trim() || 'Varies',
+    domain: document.getElementById('qa-domain').value.trim() || '—',
+    eligibility: document.getElementById('qa-notes').value.trim() || '—',
+    url: document.getElementById('qa-url').value.trim() || url,
+    deadline: document.getElementById('qa-deadline').value || undefined,
+    notes: 'Added from news on ' + new Date().toLocaleDateString('en-IN'),
+    userAdded: true
+  };
+  userGrants.push(newGrant);
+  saveUserGrants();
+  closeModal();
+  render();
+}
+function renderKeywordPanel() {
+  const p = document.getElementById('keyword-panel');
+  p.innerHTML = `
+    <div class="kp-title">🔍 Refresh news on any keyword — opens Google News in a new tab</div>
+    ${KEYWORD_GROUPS.map(group => `
+      <div class="keyword-group">
+        <span class="kg-label">${group.label}</span>
+        ${group.keywords.map(kw =>
+          `<a class="keyword-pill" href="${newsSearchUrl(kw)}" target="_blank">${kw}</a>`
+        ).join('')}
+        <button class="keyword-batch" onclick="openAllKeywords(${JSON.stringify(group.keywords).replace(/"/g, '&quot;')})">Open all ↗</button>
+      </div>
+    `).join('')}`;
+}
+function openAllKeywords(keywords) {
+  if (!confirm(`This will open ${keywords.length} tabs in your browser. Continue?`)) return;
+  keywords.forEach(kw => window.open(newsSearchUrl(kw), '_blank'));
+}
+
+// ============================================================
+// DRAWER (hamburger menu)
+// ============================================================
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeDrawer();
+});
+
+// ============================================================
+// MAIN RENDER
+// ============================================================
+function renderLastRefresh() {
+  const el = document.getElementById('last-refresh');
+  if (!el) return;
+  if (typeof LAST_REFRESH === 'undefined' || !LAST_REFRESH) {
+    el.innerHTML = '<span style="color:#fdecc8;">⚠ Auto-refresh has never run</span>';
+    return;
+  }
+  const last = new Date(LAST_REFRESH.replace(' ', 'T'));
+  const days = Math.floor((TODAY - last) / 86400000);
+  const stamp = last.toLocaleDateString('en-IN', { day:'2-digit', month:'short' }) +
+                ' ' + last.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  let colour = '#c9d3ce', label = '';
+  if (days <= 8)      { colour = '#9ce5b8'; label = `🟢 News fresh · last refresh ${stamp} (${days}d ago)`; }
+  else if (days <= 14){ colour = '#fdecc8'; label = `🟡 News aging · last refresh ${stamp} (${days}d ago)`; }
+  else                { colour = '#fadcdc'; label = `🔴 Auto-refresh appears broken · last run ${stamp} (${days}d ago)`; }
+  el.innerHTML = `<span style="color:${colour};">${label}</span>`;
+}
+
+function renderPastToggle() {
+  const el = document.getElementById('past-deadline-toggle');
+  if (!el) return;
+  const pastCount = allGrants().filter(g => {
+    if (!g.deadline) return false;
+    const d = daysBetween(TODAY, new Date(g.deadline));
+    const st = getStatus(g.id);
+    return d < 0 && !['submitted', 'won', 'lost'].includes(st);
+  }).length;
+  if (pastCount === 0) { el.innerHTML = ''; return; }
+  if (showPastDeadlines) {
+    el.innerHTML = `Showing ${pastCount} past-deadline grants. <a href="#" onclick="showPastDeadlines=false;render();return false;" style="color:#2a8f5e;font-weight:700;">Hide them</a>`;
+  } else {
+    el.innerHTML = `${pastCount} past-deadline grants auto-hidden. <a href="#" onclick="showPastDeadlines=true;render();return false;" style="color:#2a8f5e;font-weight:700;">Show them</a>`;
+  }
+}
+
+function render() {
+  renderTiles();
+  renderNews();
+  renderLastRefresh();
+  renderPastToggle();
+  if (currentView === 'list') renderList();
+  else renderCalendar();
+  // sync hamburger badge with news count
+  const badge = document.getElementById('hamburger-badge');
+  if (badge) badge.textContent = NEWS.length;
+}
+
+document.addEventListener('DOMContentLoaded', render);
+render();
+</script>
+
+</body>
+</html>

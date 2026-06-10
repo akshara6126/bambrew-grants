@@ -1,0 +1,40 @@
+name: Refresh Bambrew Grants News
+
+on:
+  schedule:
+    # Mon + Thu at 09:00 IST = 03:30 UTC
+    - cron: '30 3 * * 1'
+    - cron: '30 3 * * 4'
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to commit the refreshed index.html
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run the news refresher
+        run: python3 scripts/refresh.py
+
+      - name: Commit and push if dashboard changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain index.html)" ]]; then
+            git add index.html
+            git commit -m "chore: auto-refresh news ($(date -u +%Y-%m-%d))"
+            git push
+            echo "✓ Dashboard updated and pushed — Vercel will redeploy."
+          else
+            echo "No changes to commit."
+          fi

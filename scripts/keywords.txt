@@ -1,0 +1,64 @@
+# Bambrew grants — keywords to track on Google News
+# One keyword per line. Lines starting with # are ignored.
+# Edit freely; refresh.py reads this on every run.
+
+# === Bambrew + materials ===
+Bambrew sustainable packaging
+biopolymer packaging India
+PBAT compostable India
+PLA biodegradable India
+
+# === India grant bodies ===
+"BIRAC BioE3" 2026
+"BIRAC BIG" grant
+"DBT BIRAC" call 2026
+"NABARD" climate fund 2026
+"NABARD Green Impact Fund"
+"NITI Aayog" "Atal Innovation Mission" circular
+"Atal New India Challenge" startup
+"ELEVATE Karnataka" 2026
+"ELEVATE NxT" Karnataka startup
+"C-CAMP" sustainability grant
+"TDB" "India-Finland" 2026
+"Marico Innovation Foundation"
+
+# === International programmes ===
+"CBE JU" films coatings 2026
+"EU LIFE Programme" circular economy 2026
+"Horizon Europe" circular packaging
+"Innovate UK" SSPP plastic packaging
+"IKEA Foundation" India circular
+"Bezos Earth Fund" biopolymer
+"Earthshot Prize" 2027
+"Green Climate Fund" India NABARD
+"ADB Ventures" climate India
+
+# === Sector + regulation ===
+India plastic waste management rules 2026
+India circular economy grant 2026
+sustainable packaging India funding 2026
+compostable packaging startup India funding
+
+# === Sustainable / compostable / plastic-free packaging news ===
+"sustainable packaging" India 2026
+"compostable packaging" India
+"biodegradable packaging" India launch
+"plastic-free packaging" India
+"circular packaging" India brand
+"EPR" "plastic" India 2026
+"single-use plastic" ban India 2026
+"compostable bags" India launch
+"bamboo packaging" India
+
+# === Corporate sustainability commitments (potential customers / market signals) ===
+"commits to" "plastic-free" packaging
+"pledges" "sustainable packaging"
+"100% sustainable packaging"
+"plastic-free pledge" brand
+"transition to" "compostable packaging"
+"phase out plastic" packaging brand
+"net zero" packaging India
+"ESG" packaging India brand
+"recycled content" packaging India brand
+FMCG "sustainable packaging" India
+D2C brand "plastic-free" India
