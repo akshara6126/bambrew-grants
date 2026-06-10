@@ -872,14 +872,14 @@ const GRANTS = [
     eligibility: 'Indian biotech / bio-manufacturing entities; biopolymer SKUs qualify',
     url: 'https://birac.nic.in/cfp.php',
     launch: '2025-11-21', deadline: '2026-06-30',
-    notes: 'Highest strategic fit; मूलांकुर hubs under this policy' },
+    notes: 'Highest strategic fit; मूलांकुर hubs under this policy', cycleMonths: 12 },
 
   { id: 'birac-big', name: 'BIRAC BIG (Biotechnology Ignition Grant)', region: 'india', type: 'cyclical',
     value: 'Up to ₹50 lakh', domain: 'Biotech innovation with commercialisation potential',
     eligibility: 'Indian biotech startups; TRL 4+',
     url: 'https://birac.nic.in/big.php',
     launch: '2026-07-01', deadline: '2026-07-31',
-    notes: 'Biannual: 1 Jan and 1 Jul calls each year. Next call opens 1 Jul 2026.' },
+    notes: 'Biannual: 1 Jan and 1 Jul calls each year. Next call opens 1 Jul 2026.', cycleMonths: 6 },
 
   { id: 'birac-bipp', name: 'BIRAC BIPP', region: 'india', type: 'rolling',
     value: 'Up to ₹5 cr (equity/grant mix)', domain: 'Industry-academia biotech partnerships',
@@ -898,7 +898,7 @@ const GRANTS = [
     eligibility: 'Indian startups in sustainability / climate',
     url: 'https://www.ccamp.res.in/',
     launch: '2026-02-17', deadline: '2026-04-01',
-    notes: '2026 cycle is past — track for 2027 cycle (~Feb 2027 announcement, ~Apr 2027 deadline).' },
+    notes: '2026 cycle is past — track for 2027 cycle (~Feb 2027 announcement, ~Apr 2027 deadline).', cycleMonths: 12 },
 
   { id: 'ccamp-win', name: 'C-CAMP WIN CoE (Non-Dilutive)', region: 'india', type: 'rolling',
     value: 'Non-dilutive (varies)', domain: 'Innovation; bio-manufacturing',
@@ -911,27 +911,27 @@ const GRANTS = [
     eligibility: 'Indian company + Finnish partner consortium',
     url: 'https://www.tdb.gov.in/',
     launch: '2026-04-01', deadline: '2026-08-28',
-    notes: 'Needs Finnish co-applicant; partner-mapping required. Closes at 16:00 IST.' },
+    notes: 'Needs Finnish co-applicant; partner-mapping required. Closes at 16:00 IST.', cycleMonths: 12 },
 
   { id: 'nidhi-prayas', name: 'DST NIDHI PRAYAS Cohort 3.0', region: 'india', type: 'cyclical',
     value: '₹10 lakh prototype grant', domain: 'Prototype-stage hardtech / deeptech',
     eligibility: 'Innovators via PRAYAS Centres (TBIs)',
     url: 'https://nidhi-prayas.org/',
     launch: '2026-05-19', deadline: '2026-06-19',
-    notes: 'Apply via a PRAYAS-affiliated incubator (e.g. C-CAMP, IIM-B NSRCEL).' },
+    notes: 'Apply via a PRAYAS-affiliated incubator (e.g. C-CAMP, IIM-B NSRCEL).', cycleMonths: 12 },
 
   { id: 'dst-itbi', name: 'DST-iTBI Ignition Grant (Cohort 3.0)', region: 'india', type: 'cyclical',
     value: 'Up to ₹10 lakh', domain: 'GreenTech / CleanTech / DeepTech',
     eligibility: 'Indian S&T startups at idea / prototype stage',
     url: 'https://www.indiascienceandtechnology.gov.in/funding-opportunities/startups',
-    notes: 'Cohort-based annual call.' },
+    notes: 'Cohort-based annual call.', cycleMonths: 12 },
 
   { id: 'sisfs', name: 'Startup India Seed Fund (SISFS)', region: 'india', type: 'cyclical',
     value: '₹20L grant + ₹50L convertible debt', domain: 'DPIIT-recognised startups, any sector',
     eligibility: 'DPIIT-recognised; <2 yrs old',
     url: 'https://seedfund.startupindia.gov.in/',
     launch: '2026-01-01', deadline: '2026-05-31',
-    notes: '2026 cycle is past — next cycle ~May 2027.' },
+    notes: '2026 cycle is past — next cycle ~May 2027.', cycleMonths: 12 },
 
   { id: 'bioai', name: 'DBT-BIRAC BioE3 BioAI Call', region: 'india', type: 'deadline',
     value: 'Varies', domain: 'High-performance bio-manufacturing using AI',
@@ -943,33 +943,33 @@ const GRANTS = [
     value: '₹8–12 lakh', domain: 'Plastic waste & circularity (CSR-backed)',
     eligibility: 'Indian startups solving plastic-waste challenges',
     url: 'https://siic.iitk.ac.in/',
-    notes: 'Lower ticket; useful for narrative + ecosystem credibility.' },
+    notes: 'Lower ticket; useful for narrative + ecosystem credibility.', cycleMonths: 12 },
 
   { id: 'elevate', name: 'ELEVATE Karnataka 2026', region: 'india', type: 'deadline',
     value: 'Up to ₹50 lakh', domain: 'Sector-agnostic; cleantech-friendly',
     eligibility: 'Karnataka-registered Pvt Ltd / LLP / OPC; ≤10 yrs old',
     url: 'https://elevate.startupkarnataka.in/',
     launch: '2026-04-15', deadline: '2026-06-25',
-    notes: 'Bambrew is Karnataka-HQ\'d — direct home-state grant; milestone-based tranches.' },
+    notes: 'Bambrew is Karnataka-HQ\'d — direct home-state grant; milestone-based tranches.', cycleMonths: 12 },
 
   { id: 'elevate-nxt', name: 'ELEVATE NxT (Karnataka deeptech)', region: 'india', type: 'cyclical',
     value: 'Up to ₹1 cr', domain: 'Deeptech incl. green energy / sustainability',
     eligibility: 'Karnataka deeptech ventures',
     url: 'https://www.missionstartupkarnataka.org/elevate-karnataka',
-    notes: '₹150 cr corpus; biopolymer-process tech qualifies as deeptech.' },
+    notes: '₹150 cr corpus; biopolymer-process tech qualifies as deeptech.', cycleMonths: 12 },
 
   { id: 'anic', name: 'NITI Aayog AIM · ANIC', region: 'india', type: 'cyclical',
     value: 'Up to ₹1 cr', domain: 'Sectoral tech innovations (circular econ in 2026 cohort)',
     eligibility: 'Indian tech startups',
     url: 'https://aim.gov.in/anic-overview.php',
-    notes: '2026 cohort highlights circular economy + sustainable systems explicitly.' },
+    notes: '2026 cohort highlights circular economy + sustainable systems explicitly.', cycleMonths: 12 },
 
   { id: 'marico', name: 'Marico Innovation Foundation · Indian Innovation Icons 2027', region: 'india', type: 'deadline',
     value: 'Award + mentorship + follow-on', domain: 'Plastic waste, cleantech, agritech',
     eligibility: 'Indian innovators with game-changing impact',
     url: 'https://www.maricoinnovationfoundation.org/innovation-for-india-awards/',
     launch: '2026-06-01', deadline: '2026-06-30',
-    notes: 'Email innovate@marico.com. Non-cash but brand credibility lever.' },
+    notes: 'Email innovate@marico.com. Non-cash but brand credibility lever.', cycleMonths: 24 },
 
   { id: 'mahindra-rise', name: 'Mahindra Rise Prize', region: 'india', type: 'cyclical',
     value: 'Up to USD 1M', domain: 'Disruptive innovation (theme rotates)',
@@ -1003,7 +1003,7 @@ const GRANTS = [
     eligibility: 'Proven prototype with measurable environmental impact; nominated',
     url: 'https://earthshotprize.org/',
     launch: '2026-10-01', deadline: '2026-11-30',
-    notes: 'Nomination window typically Oct–Nov each year. Need Official Nominator (Innovate UK / WWF India / Commonwealth Sec.).' },
+    notes: 'Nomination window typically Oct–Nov each year. Need Official Nominator (Innovate UK / WWF India / Commonwealth Sec.).', cycleMonths: 12 },
 
   { id: 'bezos', name: 'Bezos Earth Fund + Earthshot partnership', region: 'global', type: 'rolling',
     value: '$4.8M pool (varies)', domain: 'Climate / nature / biodegradable bioplastics',
@@ -1021,7 +1021,7 @@ const GRANTS = [
     value: 'Mentorship + Europe-wide pilot', domain: 'Reusable / sustainable e-commerce packaging',
     eligibility: 'European startups (currently)',
     url: 'https://sustainability.aboutamazon.com/operations/the-climate-pledge-fund/sustainability-accelerator',
-    notes: 'Not directly applicable now — watch for Asia expansion.' },
+    notes: 'Not directly applicable now — watch for Asia expansion.', cycleMonths: 12 },
 
   { id: 'climate-kic', name: 'EIT Climate-KIC calls', region: 'eu', type: 'rolling',
     value: 'Varies', domain: 'Climate innovation; circular economy',
@@ -1052,7 +1052,7 @@ const GRANTS = [
     eligibility: 'Entrepreneurship Support Orgs (ESOs) in Bengaluru',
     url: 'https://ikeafoundation.org/grants/circular-economy-catalyst/',
     launch: '2026-04-01', deadline: '2026-07-31',
-    notes: 'Bengaluru-specific. Masterclasses Apr–Jul 2026 followed by grant round.' },
+    notes: 'Bengaluru-specific. Masterclasses Apr–Jul 2026 followed by grant round.', cycleMonths: 12 },
 
   { id: 'ikea-ande', name: 'IKEA Foundation + ANDE Waste & Circularity IIF', region: 'global', type: 'cyclical',
     value: 'Grant pool for SGBs', domain: 'Waste management & circular economy',
@@ -1064,7 +1064,7 @@ const GRANTS = [
     value: 'Share of $4M AWS credits', domain: 'Climate solutions using cloud + compute',
     eligibility: 'Climate-focused startups with 2-3 month buildable projects',
     url: 'https://aws.amazon.com/startups/learn/compute-for-climate-fellowship',
-    notes: '2026 cohort active. Credits not cash.' },
+    notes: '2026 cohort active. Credits not cash.', cycleMonths: 12 },
 
   { id: 'msft-cif', name: 'Microsoft Climate Innovation Fund', region: 'global', type: 'rolling',
     value: 'USD 1–25M equity', domain: 'Climate-tech with early commercial traction',
@@ -1089,32 +1089,32 @@ const GRANTS = [
     eligibility: 'GLOBALLY OPEN. MVP with commercialisation intent required. Winning solution must be piloted in Indonesia (local partner OK).',
     url: 'https://climateimpactinnovations.com/',
     launch: '2026-04-08', deadline: '2026-06-20',
-    notes: 'Backed by East Ventures + Temasek Foundation + Tencent. Indonesia\'s biggest climate-tech competition. 3 tracks; Circular Economy is the direct fit for Bambrew. Closes 23:59 GMT+7.' },
+    notes: 'Backed by East Ventures + Temasek Foundation + Tencent. Indonesia\'s biggest climate-tech competition. 3 tracks; Circular Economy is the direct fit for Bambrew. Closes 23:59 GMT+7.', cycleMonths: 12 },
 
   { id: 'eco-kranti', name: 'Eco Kranti · Shubh Labh 1.0 (Bharat Startup Challenge 2026)', region: 'india', type: 'cyclical',
     value: 'Grant + ecosystem access (varies by track)', domain: 'Single-use plastics elimination, sustainable materials, circular economy, waste management',
     eligibility: 'Indian startups in green / circular economy categories',
     url: 'https://www.startupgrantsindia.com/',
-    notes: 'NEW (2026). Directly named sub-themes include single-use plastic elimination + sustainable materials — perfect Bambrew fit.' },
+    notes: 'NEW (2026). Directly named sub-themes include single-use plastic elimination + sustainable materials — perfect Bambrew fit.', cycleMonths: 12 },
 
   { id: 'nsrcel-circular', name: 'NSRCEL · Circular Bharat Accelerator', region: 'india', type: 'cyclical',
     value: 'Accelerator + pilot opportunities + go-to-market support', domain: 'Circular economy startups; pilot & scale-up focus',
     eligibility: 'Indian circular-economy ventures',
     url: 'https://nsrcel.org/circular-bharat-accelerator/',
-    notes: 'Multi-stakeholder: NSRCEL (IIM-B) + HUL + NITI Aayog + Xynteo. Strong on pilot opportunities — HUL connection makes this a customer-acquisition channel as well.' },
+    notes: 'Multi-stakeholder: NSRCEL (IIM-B) + HUL + NITI Aayog + Xynteo. Strong on pilot opportunities — HUL connection makes this a customer-acquisition channel as well.', cycleMonths: 12 },
 
   { id: 'zayed', name: 'Zayed Sustainability Prize', region: 'global', type: 'cyclical',
     value: 'USD 1 million per category', domain: 'Sustainability innovation — Food, Health, Energy, Water, Climate Action categories',
     eligibility: 'Globally open. SMEs, NGOs, and high schools.',
     url: 'https://www.zayedsustainabilityprize.com/',
     launch: '2026-09-01', deadline: '2026-12-15',
-    notes: 'Singapore\'s N&E Innovations won USD 1M in 2026 Food category for biodegradable food packaging — proves the fit. Annual nomination cycle Sept–Dec.' },
+    notes: 'Singapore\'s N&E Innovations won USD 1M in 2026 Food category for biodegradable food packaging — proves the fit. Annual nomination cycle Sept–Dec.', cycleMonths: 12 },
 
   { id: 'tata-prize', name: 'Tata Transformation Prize (via NYAS)', region: 'global', type: 'cyclical',
     value: 'Recognition + funding (varies by category)', domain: 'Sustainable agriculture, food security, environmental solutions',
     eligibility: 'India-based scientists / institutions',
     url: 'https://www.nyas.org/program-category/tata/',
-    notes: 'Recognition prize + financial support. Hosted by New York Academy of Sciences with Tata backing.' },
+    notes: 'Recognition prize + financial support. Hosted by New York Academy of Sciences with Tata backing.', cycleMonths: 12 },
 
   { id: 'gef-9', name: 'Global Environment Facility (GEF-9 cycle)', region: 'multilateral', type: 'rolling',
     value: 'USD 7.7B+ replenishment pool (project-specific allocations)', domain: 'Climate change, land degradation, biodiversity, chemicals & waste',
@@ -1126,7 +1126,7 @@ const GRANTS = [
     value: 'Up to ₹5 cr', domain: 'Polymer research including biopolymers',
     eligibility: 'Indian R&D / startup ventures with polymer focus',
     url: 'https://www.entrepreneurindia.co/blogs/polymer-startup-funding-india/',
-    notes: 'Direct R&D fit. Bambrew can apply for biopolymer-specific work (process optimisation, new grades, etc.).' },
+    notes: 'Direct R&D fit. Bambrew can apply for biopolymer-specific work (process optimisation, new grades, etc.).', cycleMonths: 12 },
 
   { id: 'csir-comm', name: 'CSIR Tech Commercialisation Schemes (NMITLI / SETU / ASPIRE)', region: 'india', type: 'rolling',
     value: 'Grant + Equity + Debt blend (varies)', domain: 'Tech commercialisation by startups & SMEs',
@@ -1138,7 +1138,7 @@ const GRANTS = [
     value: 'Up to USD 25,000', domain: 'Sustainable travel, climate resilience, community-driven solutions',
     eligibility: 'ASEAN-based or ASEAN-led social enterprises (requires regional entity)',
     url: 'https://www2.fundsforngos.org/community-development/open-call-grants-to-support-asean-changemakers/',
-    notes: 'Low ticket. Only viable if Bambrew sets up ASEAN entity or has ASEAN-registered co-applicant.' }
+    notes: 'Low ticket. Only viable if Bambrew sets up ASEAN entity or has ASEAN-registered co-applicant.', cycleMonths: 12 }
 ];
 
 // ============================================================
@@ -1253,6 +1253,25 @@ let calendarDate = (() => { const d = new Date(); return new Date(d.getFullYear(
 function saveState() {
   localStorage.setItem('bambrew-grants', JSON.stringify(userState));
 }
+// === Cyclical-grant auto-rollover ===
+// If a grant has cycleMonths set and its original deadline has passed,
+// roll forward by N×cycleMonths until the deadline is in the future.
+// The displayed deadline becomes the projected next-cycle date.
+function effectiveDeadline(g) {
+  if (!g.deadline) return null;
+  const orig = new Date(g.deadline);
+  if (!g.cycleMonths || orig >= TODAY) return orig;
+  const d = new Date(orig);
+  while (d < TODAY) {
+    d.setMonth(d.getMonth() + g.cycleMonths);
+  }
+  return d;
+}
+function isRolledOver(g) {
+  if (!g.deadline || !g.cycleMonths) return false;
+  return new Date(g.deadline) < TODAY;
+}
+
 function getStatus(id)  { return (userState[id] && userState[id].status) || 'not-started'; }
 function getNotes(id)   { return (userState[id] && userState[id].notes) || ''; }
 function getChecked(id) { return userState[id] && userState[id].lastChecked ? new Date(userState[id].lastChecked) : null; }
@@ -1333,7 +1352,7 @@ function filtered() {
     // Auto-hide grants whose deadline is in the past — unless the user has
     // already submitted/won them (in which case they're worth keeping visible).
     if (!showPastDeadlines && g.deadline) {
-      const d = daysBetween(TODAY, new Date(g.deadline));
+      const d = daysBetween(TODAY, effectiveDeadline(g));
       const st = getStatus(g.id);
       const keepRegardless = ['submitted', 'won', 'lost'].includes(st);
       if (d < 0 && !keepRegardless) return false;
@@ -1346,8 +1365,8 @@ function filtered() {
     if (sort === 'value') return a.value.localeCompare(b.value);
     if (sort === 'status') return getStatus(a.id).localeCompare(getStatus(b.id));
     // deadline default: items with deadline come first, sorted ascending; then rolling/cyclical
-    const ad = a.deadline ? new Date(a.deadline).getTime() : Infinity;
-    const bd = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+    const ad = a.deadline ? effectiveDeadline(a).getTime() : Infinity;
+    const bd = b.deadline ? effectiveDeadline(b).getTime() : Infinity;
     return ad - bd;
   });
 
@@ -1362,7 +1381,7 @@ function renderTiles() {
   let upcoming30 = 0, upcoming60 = 0, upcoming90 = 0, inProgress = 0, stale = 0;
   allGrants().forEach(g => {
     if (g.deadline) {
-      const d = daysBetween(TODAY, new Date(g.deadline));
+      const d = daysBetween(TODAY, effectiveDeadline(g));
       if (d >= 0 && d <= 30) upcoming30++;
       if (d >= 0 && d <= 60) upcoming60++;
       if (d >= 0 && d <= 90) upcoming90++;
@@ -1409,9 +1428,9 @@ function renderTiles() {
 function openDeadlineModal(maxDays) {
   const matching = allGrants().filter(g => {
     if (!g.deadline) return false;
-    const d = daysBetween(TODAY, new Date(g.deadline));
+    const d = daysBetween(TODAY, effectiveDeadline(g));
     return d >= 0 && d <= maxDays;
-  }).sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+  }).sort((a, b) => effectiveDeadline(a) - effectiveDeadline(b));
 
   const title = `Grants closing in ≤${maxDays} days`;
   let body = `<h3>${title}</h3>
@@ -1422,7 +1441,7 @@ function openDeadlineModal(maxDays) {
   } else {
     body += '<div style="margin-top: 8px;">';
     matching.forEach(g => {
-      const d = daysBetween(TODAY, new Date(g.deadline));
+      const d = daysBetween(TODAY, effectiveDeadline(g));
       const dClass = d <= 14 ? 'days-critical' : d <= 45 ? 'days-urgent' : 'days-comfortable';
       const st = getStatus(g.id);
       body += `
@@ -1461,7 +1480,7 @@ function renderList() {
   tbody.innerHTML = rows.map(g => {
     let daysCell = '';
     if (g.deadline) {
-      const d = daysBetween(TODAY, new Date(g.deadline));
+      const d = daysBetween(TODAY, effectiveDeadline(g));
       if (d < 0) daysCell = `<span class="days-left days-passed">Past</span>`;
       else if (d <= 14) daysCell = `<span class="days-left days-critical">${d}d</span>`;
       else if (d <= 45) daysCell = `<span class="days-left days-urgent">${d}d</span>`;
@@ -1470,7 +1489,13 @@ function renderList() {
       daysCell = `<span class="days-left days-rolling">—</span>`;
     }
 
-    const cycleLabel = g.deadline ? fmtDate(g.deadline) : (g.type === 'rolling' ? 'Rolling' : 'Cyclical');
+    const eff = effectiveDeadline(g);
+    const rolled = isRolledOver(g);
+    const cycleLabel = eff
+      ? (rolled
+          ? `${fmtDate(eff.toISOString().slice(0,10))} <br><span style="font-size:9px;color:#b88410;font-weight:700;">(est. next cycle)</span>`
+          : fmtDate(g.deadline))
+      : (g.type === 'rolling' ? 'Rolling' : 'Cyclical');
 
     const st = getStatus(g.id);
 
@@ -1577,7 +1602,7 @@ function renderCalendar() {
   // Rolling chips
   const rolling = allGrants().filter(g => g.type === 'rolling' ||
     (g.type === 'cyclical' && !g.deadline) ||
-    (g.deadline && !(new Date(g.deadline).getFullYear() === year && new Date(g.deadline).getMonth() === month)));
+    (g.deadline && !(effectiveDeadline(g).getFullYear() === year && effectiveDeadline(g).getMonth() === month)));
   // narrow to just rolling for the strip
   const rollingOnly = allGrants().filter(g => g.type === 'rolling');
   document.getElementById('rolling-chips').innerHTML = rollingOnly.map(g =>
@@ -1603,7 +1628,7 @@ function openModal(id) {
   const dStr = g.deadline ? fmtDate(g.deadline) : (g.type === 'rolling' ? 'Rolling — no fixed deadline' : 'Cyclical');
   let daysHtml = '';
   if (g.deadline) {
-    const d = daysBetween(TODAY, new Date(g.deadline));
+    const d = daysBetween(TODAY, effectiveDeadline(g));
     if (d < 0) daysHtml = `<span class="days-left days-passed">Past</span>`;
     else daysHtml = `<span class="days-left ${d<=14?'days-critical':d<=45?'days-urgent':'days-comfortable'}">${d} days left</span>`;
   } else {
@@ -1780,7 +1805,7 @@ function renderPastToggle() {
   if (!el) return;
   const pastCount = allGrants().filter(g => {
     if (!g.deadline) return false;
-    const d = daysBetween(TODAY, new Date(g.deadline));
+    const d = daysBetween(TODAY, effectiveDeadline(g));
     const st = getStatus(g.id);
     return d < 0 && !['submitted', 'won', 'lost'].includes(st);
   }).length;
