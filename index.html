@@ -1224,7 +1224,11 @@ function autoGrants() {
   });
 }
 
-function allGrants() { return GRANTS.concat(userGrants).concat(autoGrants()); }
+// Main table only shows VERIFIED grants (curated + user-added).
+// Auto-discovered grants are quarantined in the Review Queue
+// — they only join allGrants() after the user explicitly clicks ✓ Keep.
+function allGrants() { return GRANTS.concat(userGrants); }
+function pendingReviewGrants() { return autoGrants(); }
 function isUserAdded(id) { return userGrants.some(g => g.id === id); }
 function isAutoDiscovered(id) { return autoGrants().some(g => g.id === id); }
 function removeUserGrant(id) {
@@ -1413,6 +1417,11 @@ function renderTiles() {
       <div class="value">${upcoming90}</div>
       <div class="sub">click to view list →</div>
     </div>
+    <div class="tile amber clickable" onclick="openReviewQueue()" title="Click to review auto-discovered grants before they enter your tracker">
+      <div class="label">🤖 Review queue</div>
+      <div class="value">${pendingReviewGrants().length}</div>
+      <div class="sub">click to verify →</div>
+    </div>
     <div class="tile amber">
       <div class="label">Stale · need re-check</div>
       <div class="value">${stale}</div>
@@ -1423,6 +1432,43 @@ function renderTiles() {
       <div class="value">${inProgress}</div>
       <div class="sub">being prepared</div>
     </div>`;
+}
+
+function openReviewQueue() {
+  const pending = pendingReviewGrants();
+  let body = `<h3>🤖 Review queue · ${pending.length} auto-discovered grant${pending.length === 1 ? '' : 's'}</h3>
+    <div class="meta-row">
+      These were detected automatically from news headlines. <b>Verify each one</b> before adding it to your tracker —
+      click the source link to confirm it's a real grant, then ✓ Keep or ✗ Dismiss.
+    </div>`;
+
+  if (pending.length === 0) {
+    body += `<p style="color:#6b7680; padding: 14px 0;">Queue is empty. Nothing to review right now.</p>`;
+  } else {
+    body += '<div style="margin-top: 8px;">';
+    pending.forEach(g => {
+      body += `
+        <div style="border-left: 3px solid #b88410; background: #fdf8eb; padding: 10px 13px; margin-bottom: 9px; border-radius: 4px;">
+          <div style="font-weight: 700; color: #0f2a1e; font-size: 13px; margin-bottom: 5px;">${g.name}</div>
+          <div style="font-size: 11px; color: #57636d; margin-bottom: 6px;">
+            <span class="pill pill-${g.region}">${REGION_LABELS[g.region]}</span>
+            · discovered ${g.discoveredOn ? fmtDate(g.discoveredOn) : 'recently'}
+            · <a href="${g.url}" target="_blank" style="color:#1c4170;font-weight:700;">↗ Open source to verify</a>
+          </div>
+          <div style="font-size: 10.5px; color: #6b7680; margin-bottom: 8px; font-style: italic;">
+            ${g.notes || 'Auto-detected from news headline. Full details unavailable until you verify.'}
+          </div>
+          <button onclick="promoteAutoGrant('${g.id}'); openReviewQueue();"
+                  style="background:#2a8f5e; color:#fff; border:0; padding:5px 12px; border-radius:4px; cursor:pointer; font-weight:700; font-size:11.5px; margin-right:6px;">✓ Keep — add to my tracker</button>
+          <button onclick="dismissAutoGrant('${g.id}'); openReviewQueue();"
+                  style="background:transparent; color:#842121; border:1px solid #fadcdc; padding:5px 12px; border-radius:4px; cursor:pointer; font-weight:700; font-size:11.5px;">✗ Dismiss</button>
+        </div>`;
+    });
+    body += '</div>';
+  }
+  body += `<button class="modal-close" onclick="closeModal()" style="margin-top:8px;">Close</button>`;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-overlay').classList.add('show');
 }
 
 function openDeadlineModal(maxDays) {
