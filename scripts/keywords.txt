@@ -99,3 +99,24 @@ D2C brand "plastic-free" India
 "UNDP India" sustainability grant
 "UNEP India" plastic grant
 "World Bank India" sustainable packaging
+
+# === Compostable garbage bags (direct Bambrew product line) ===
+"compostable garbage bags" India
+"compostable bin liners" India
+"home compostable bags" launch
+"biodegradable trash bags" India
+"compostable waste bags" India
+
+# === Corporate sustainability initiatives & announcements (sales-dev signals) ===
+"sustainability initiative" packaging India
+"launches" "sustainable packaging" India
+"launches" "compostable" India
+"introduces" "compostable packaging" India
+"rolls out" "sustainable packaging"
+"adopts" "compostable packaging"
+"switches to" "sustainable packaging" India
+"sustainability commitment" brand India
+"partners with" "sustainable packaging" India
+"collaborates" "sustainable packaging" India
+brand "goes plastic-free" India
+company "eco-friendly packaging" India launch
