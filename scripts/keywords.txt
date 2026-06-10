@@ -62,3 +62,40 @@ compostable packaging startup India funding
 "recycled content" packaging India brand
 FMCG "sustainable packaging" India
 D2C brand "plastic-free" India
+
+# === Product-specific (films, wrappers, mailers, agricultural) ===
+"compostable films" India
+"compostable film" launch
+"bio films" packaging India
+"compostable wrappers"
+"compostable mailers" India
+"biodegradable courier bags" India
+"compostable cutlery" India
+"biodegradable mulch film"
+"compostable food packaging" India
+"compostable trays" India
+
+# === Sustainability / climate / green funding ===
+"sustainability grant" India 2026
+"sustainability funding" startup India
+"climate tech funding" India 2026
+"cleantech grants" India
+"green tech grants" India
+"ESG funding" startup India
+"impact investment" circular economy India
+"carbon credit" startup grant India
+"climate fund" India 2026 startup
+"green finance" India startup 2026
+"environmental grants" India 2026
+
+# === Policy + regulation (market tailwinds) ===
+"Extended Producer Responsibility" India
+"EPR" packaging India 2026
+"single-use plastic alternatives" India
+"plastic ban" India 2026 alternatives
+
+# === Multilateral & regional channels ===
+"ASEAN" circular economy grant
+"UNDP India" sustainability grant
+"UNEP India" plastic grant
+"World Bank India" sustainable packaging
