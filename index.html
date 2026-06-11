@@ -509,6 +509,17 @@
   .type-cyclical { background: #fdecc8; color: #7a4d05; }
   .type-rolling  { background: #d6efe0; color: #155c3a; }
 
+  .tdb-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 9.6px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+  }
+  .tdb-yes { background: #1c4170; color: #fff; }
+  .tdb-no  { background: #f0f2f4; color: #57636d; }
+
   .status-select {
     font-family: inherit;
     font-size: 11px;
@@ -811,14 +822,15 @@
     <table class="grant-table">
       <thead>
         <tr>
-          <th style="width: 30%;">Grant</th>
-          <th style="width: 9%;">Region</th>
-          <th style="width: 8%;">Type</th>
+          <th style="width: 27%;">Grant</th>
+          <th style="width: 8%;">Region</th>
+          <th style="width: 7%;">Type</th>
+          <th style="width: 7%;">TDB?</th>
           <th style="width: 11%;">Value</th>
-          <th style="width: 11%;">Deadline / Cycle</th>
+          <th style="width: 10%;">Deadline / Cycle</th>
           <th style="width: 7%;">Days Left</th>
           <th style="width: 10%;">Status</th>
-          <th style="width: 14%;">Notes</th>
+          <th style="width: 13%;">Notes</th>
         </tr>
       </thead>
       <tbody id="grants-tbody"></tbody>
@@ -1277,6 +1289,16 @@ function isRolledOver(g) {
   return new Date(g.deadline) < TODAY;
 }
 
+// === TDB (Technology Development Board) flag ===
+// Detects grants issued by India's TDB by id prefix, name substring, or domain.
+function isTdbGrant(g) {
+  if (!g) return false;
+  if (g.id && g.id.toLowerCase().startsWith('tdb-')) return true;
+  if (g.name && /\bTDB\b/i.test(g.name)) return true;
+  if (g.url && /tdb\.gov\.in/i.test(g.url)) return true;
+  return false;
+}
+
 function getStatus(id)  { return (userState[id] && userState[id].status) || 'not-started'; }
 function getNotes(id)   { return (userState[id] && userState[id].notes) || ''; }
 function getChecked(id) { return userState[id] && userState[id].lastChecked ? new Date(userState[id].lastChecked) : null; }
@@ -1566,6 +1588,9 @@ function renderList() {
         </td>
         <td><span class="pill pill-${g.region}">${REGION_LABELS[g.region]}</span></td>
         <td><span class="type-pill type-${g.type}">${TYPE_LABELS[g.type]}</span></td>
+        <td>${isTdbGrant(g)
+          ? '<span class="tdb-pill tdb-yes">TDB</span>'
+          : '<span class="tdb-pill tdb-no">Non-TDB</span>'}</td>
         <td>${g.value}</td>
         <td>${cycleLabel}</td>
         <td>${daysCell}</td>
