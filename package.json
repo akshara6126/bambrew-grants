@@ -1,0 +1,9 @@
+{
+  "name": "bambrew-grants",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bambrew grants tracker — dashboard + per-user state",
+  "dependencies": {
+    "@vercel/kv": "^3.0.0"
+  }
+}
