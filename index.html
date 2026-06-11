@@ -744,6 +744,78 @@
 </head>
 <body>
 
+<!-- ============================== PASSWORD GATE ============================== -->
+<div id="pw-gate" style="
+  position: fixed; inset: 0; z-index: 9999;
+  background: #0f2a1e; color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  padding: 20px;
+">
+  <svg viewBox="0 0 180 56" xmlns="http://www.w3.org/2000/svg" style="height: 56px; width: auto; margin-bottom: 28px;">
+    <circle cx="30"  cy="28" r="22" fill="#5DAA70"/>
+    <circle cx="90"  cy="28" r="22" fill="#7BC9DA"/>
+    <circle cx="150" cy="28" r="22" fill="#F2C94C"/>
+  </svg>
+  <h1 style="font-family: 'Fraunces', Georgia, serif; font-size: 28px; margin: 0 0 8px 0; letter-spacing: -0.01em;">
+    Bambrew · Grants Tracker
+  </h1>
+  <p style="font-size: 14px; color: #c9d3ce; margin: 0 0 28px 0;">
+    Enter the team password to continue
+  </p>
+  <input id="pw-input" type="password" autofocus placeholder="Password"
+    onkeydown="if(event.key==='Enter') tryPassword();"
+    style="
+      width: 280px; padding: 12px 16px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
+      color: #fff; border-radius: 8px; font-size: 14px;
+      outline: none; font-family: inherit;
+    ">
+  <button onclick="tryPassword()" style="
+    margin-top: 14px; padding: 10px 24px;
+    background: #2a8f5e; border: 0; color: #fff;
+    border-radius: 8px; font-weight: 700; font-size: 14px;
+    cursor: pointer; letter-spacing: 0.3px;
+    font-family: inherit;
+  ">Enter →</button>
+  <div id="pw-error" style="color: #f7b3b3; font-size: 12px; margin-top: 14px; min-height: 16px;"></div>
+  <div style="position: absolute; bottom: 18px; font-size: 10.5px; color: #5e7a6c;">
+    Bambrew · Founder's Office · Internal grants tracker
+  </div>
+</div>
+
+<script>
+  // SHA-256 hash of the team password — change this hash to rotate the password.
+  // Generate a new hash: node -e "crypto.subtle.digest('SHA-256', new TextEncoder().encode('NEW_PASSWORD')).then(h => console.log([...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('')))"
+  const PW_HASH = '309a931a6d54eb1131d6601c5f55314ae479f870c3094eee2c53da0300822be0';
+
+  async function sha256Hex(s) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  async function tryPassword() {
+    const el = document.getElementById('pw-input');
+    const errEl = document.getElementById('pw-error');
+    const h = await sha256Hex(el.value);
+    if (h === PW_HASH) {
+      sessionStorage.setItem('bambrew-auth-ok', '1');
+      document.getElementById('pw-gate').style.display = 'none';
+    } else {
+      errEl.textContent = '✗ Wrong password. Ask the team for the current one.';
+      el.value = ''; el.focus();
+    }
+  }
+  // If already unlocked this session, skip the gate
+  if (sessionStorage.getItem('bambrew-auth-ok') === '1') {
+    document.addEventListener('DOMContentLoaded', () => {
+      const g = document.getElementById('pw-gate');
+      if (g) g.style.display = 'none';
+    });
+    const tryHide = () => { const g = document.getElementById('pw-gate'); if (g) g.style.display = 'none'; };
+    tryHide();
+  }
+</script>
+
 <div class="topbar">
   <div class="topbar-left">
     <button class="hamburger" onclick="openDrawer()" title="Open What's New" aria-label="Open What's New menu">
