@@ -1,30 +1,24 @@
-// /api/state — per-user state store backed by Vercel KV.
-// GET  ?user=alice            → returns the user's saved state (JSON)
-// POST { user, state }         → saves the user's state
+// /api/state — single shared state for the whole Bambrew team.
+// GET   → returns the current shared state (JSON)
+// POST  → overwrites the shared state with the new payload
 //
-// State shape (matches the existing localStorage data structures in index.html):
+// State shape (matches the existing structures in index.html):
 //   {
 //     userState:        { [grantId]: { status, notes, lastChecked } },
 //     userGrants:       [ { id, name, ... } ],
 //     dismissedAutoIds: [ "auto-12345", ... ]
 //   }
+//
+// Conflict policy: last write wins. Realistic for a 3–4 person team.
 
 import { kv } from '@vercel/kv';
 
-function safeUserKey(user) {
-  // Normalise: lowercase + trim + strip anything that isn't a letter / digit / dash / underscore.
-  const clean = String(user || '').toLowerCase().trim().replace(/[^a-z0-9_-]/g, '');
-  if (!clean || clean.length > 40) return null;
-  return `bambrew-state:${clean}`;
-}
+const SHARED_KEY = 'bambrew-shared-state';
 
 export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
-      const user = req.query.user;
-      const key = safeUserKey(user);
-      if (!key) return res.status(400).json({ error: 'Invalid or missing user param' });
-      const data = await kv.get(key);
+      const data = await kv.get(SHARED_KEY);
       return res.status(200).json(data || {
         userState: {},
         userGrants: [],
@@ -33,9 +27,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { user, state } = req.body || {};
-      const key = safeUserKey(user);
-      if (!key)  return res.status(400).json({ error: 'Invalid or missing user' });
+      const { state } = req.body || {};
       if (!state || typeof state !== 'object') {
         return res.status(400).json({ error: 'Missing state body' });
       }
@@ -43,7 +35,7 @@ export default async function handler(req, res) {
       if (JSON.stringify(state).length > 500_000) {
         return res.status(413).json({ error: 'State payload too large' });
       }
-      await kv.set(key, state);
+      await kv.set(SHARED_KEY, state);
       return res.status(200).json({ ok: true });
     }
 

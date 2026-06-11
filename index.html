@@ -756,10 +756,6 @@
     </div>
   </div>
   <div class="topbar-right">
-    <div class="user-chip" id="user-chip" onclick="switchUser()" title="Switch user">
-      <span id="user-name">…</span>
-      <span style="opacity:.6; margin-left:6px; font-size:10px;">⇄</span>
-    </div>
     <svg class="brand-logo" viewBox="0 0 180 56" xmlns="http://www.w3.org/2000/svg" aria-label="Bambrew">
       <circle cx="30"  cy="28" r="22" fill="#5DAA70"/>
       <circle cx="90"  cy="28" r="22" fill="#7BC9DA"/>
@@ -1232,31 +1228,29 @@ const TYPE_LABELS = {
   deadline: 'Deadline', cyclical: 'Cyclical', rolling: 'Rolling'
 };
 
-// === Multi-user state with Vercel KV sync ===
-// Each team member identifies themselves once; their state lives in Vercel KV
-// keyed by username and syncs across every device they sign in from.
-// Falls back to localStorage if the API is offline.
+// === Shared team state via Vercel KV ===
+// One global state for the whole Bambrew team — any change anyone makes is
+// visible to everyone else on next page load.
+// Falls back to localStorage if the API is unreachable (read-only degrade).
 
-let currentUser = localStorage.getItem('bambrew-current-user') || '';
 let userState        = {};
 let userGrants       = [];
 let dismissedAutoIds = [];
 
 async function loadStateFromServer() {
-  if (!currentUser) return;
   try {
-    const r = await fetch('/api/state?user=' + encodeURIComponent(currentUser));
+    const r = await fetch('/api/state', { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const s = await r.json();
     userState        = s.userState        || {};
     userGrants       = s.userGrants       || [];
     dismissedAutoIds = s.dismissedAutoIds || [];
-    // mirror to localStorage so the app survives if KV is briefly down
+    // mirror to localStorage so reads still work if KV is briefly down
     localStorage.setItem('bambrew-grants',          JSON.stringify(userState));
     localStorage.setItem('bambrew-user-grants',     JSON.stringify(userGrants));
     localStorage.setItem('bambrew-dismissed-auto',  JSON.stringify(dismissedAutoIds));
   } catch (e) {
-    console.warn('KV load failed, using localStorage fallback:', e);
+    console.warn('Shared-state load failed, using localStorage fallback:', e);
     userState        = JSON.parse(localStorage.getItem('bambrew-grants')          || '{}');
     userGrants       = JSON.parse(localStorage.getItem('bambrew-user-grants')     || '[]');
     dismissedAutoIds = JSON.parse(localStorage.getItem('bambrew-dismissed-auto')  || '[]');
@@ -1265,44 +1259,20 @@ async function loadStateFromServer() {
 
 let _saveTimer = null;
 function scheduleSyncToServer() {
-  // debounce: hold for 800ms, then push the latest state
+  // debounce: hold for 800ms after the last edit, then push the latest state
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(syncStateToServer, 800);
 }
 async function syncStateToServer() {
-  if (!currentUser) return;
   try {
     await fetch('/api/state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user: currentUser,
-        state: { userState, userGrants, dismissedAutoIds },
-      }),
+      body: JSON.stringify({ state: { userState, userGrants, dismissedAutoIds } }),
     });
   } catch (e) {
-    console.warn('KV save failed (state stays in localStorage):', e);
+    console.warn('Shared-state save failed (changes stayed in localStorage):', e);
   }
-}
-
-function promptForUser() {
-  let name = prompt(
-    "Who's using this dashboard?\n\n" +
-    "Enter your name (e.g. \"akshara\" or \"rushant\") so your status/notes stay with you.\n" +
-    "Re-enter the same name on any device to see your saved state."
-  );
-  if (!name) return;
-  name = name.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
-  if (!name) { alert('Name must contain letters / digits / dashes only.'); return; }
-  currentUser = name;
-  localStorage.setItem('bambrew-current-user', name);
-  loadStateFromServer().then(render);
-}
-function switchUser() {
-  if (!confirm('Switch user? Your current view will reload with the other person\'s saved state.')) return;
-  localStorage.removeItem('bambrew-current-user');
-  currentUser = '';
-  promptForUser();
 }
 
 let currentView = 'list';
@@ -1995,13 +1965,7 @@ function render() {
 }
 
 async function bootstrap() {
-  if (!currentUser) {
-    promptForUser();
-    return;
-  }
   await loadStateFromServer();
-  const nameEl = document.getElementById('user-name');
-  if (nameEl) nameEl.textContent = '👤 ' + currentUser;
   render();
 }
 
