@@ -65,6 +65,57 @@ def is_likely_grant(title):
     t = title.lower()
     return any(g in t for g in GRANT_TOKENS) and any(r in t for r in RELEVANCE_TOKENS)
 
+# ---------------------------------------------------------------
+# Verified-sources whitelist
+# ---------------------------------------------------------------
+# Google News aggregates from thousands of sites including SEO blogs and
+# unverified republishers. We only keep items whose `source` field matches a
+# known editorial publisher OR whose URL is on a .gov.in / .nic.in domain.
+# Match is case-insensitive substring against the source name.
+TRUSTED_SOURCE_PATTERNS = [
+    # --- Indian business / financial press ---
+    "economic times", "livemint", "mint",
+    "business standard", "financial express",
+    "businessline", "the hindu businessline", "hindu businessline",
+    "moneycontrol", "bq prime", "bloombergquint",
+    # --- Indian startup / VC press ---
+    "inc42", "yourstory", "your story", "entrackr", "vccircle", "the ken",
+    # --- Indian general (national) ---
+    "the hindu", "hindustan times", "indian express", "times of india", "tribune india",
+    # --- Indian government / official ---
+    "pib", "press information bureau", "ministry of",
+    # --- Global wire / financial ---
+    "reuters", "bloomberg", "associated press", "ap news",
+    "financial times", "wall street journal", "wsj", "the guardian",
+    # --- Climate / sustainability press ---
+    "mongabay", "down to earth", "downtoearth", "carbon brief", "climate home",
+    # --- Industry trade press (relevant to Bambrew) ---
+    "biospectrum", "pharmabiz", "packaging south asia",
+    # --- Devex (international grants) ---
+    "devex",
+]
+
+TRUSTED_URL_DOMAINS = [
+    ".gov.in/", ".nic.in/", "pib.gov.in",
+    # Already-good news domains that sometimes ship without a clean source name:
+    "reuters.com", "bloomberg.com", "ft.com", "economictimes.indiatimes.com",
+    "livemint.com", "business-standard.com", "thehindu.com",
+    "inc42.com", "yourstory.com", "moneycontrol.com",
+]
+
+def is_trusted_source(source, url=""):
+    """True if the item comes from a whitelisted publisher OR a govt domain."""
+    s = (source or "").lower().strip()
+    u = (url or "").lower().strip()
+    # 1. Govt / known-good URL domain (high signal, low collision)
+    if any(d in u for d in TRUSTED_URL_DOMAINS):
+        return True
+    # 2. Reject obvious junk (empty source, generic placeholder)
+    if not s or s in ("google news", "news", "press release"):
+        return False
+    # 3. Source-name whitelist
+    return any(p in s for p in TRUSTED_SOURCE_PATTERNS)
+
 # Best-effort: map a keyword fragment to a grantId in the dashboard
 # so the auto-fetched card gets a clickable "Open grant" button.
 GRANT_MAP = {
@@ -331,12 +382,19 @@ def main():
         all_items.extend(items)
 
     all_items = dedupe(all_items)
+    before_trust = len(all_items)
+    rejected = [it for it in all_items if not is_trusted_source(it["source"], it["url"])]
+    all_items = [it for it in all_items if is_trusted_source(it["source"], it["url"])]
+    log.info("Trusted-source filter: kept %d of %d items (dropped %d untrusted)",
+             len(all_items), before_trust, len(rejected))
+    for r in rejected[:10]:
+        log.info("  dropped (untrusted source=%r): %s", r["source"], r["title"][:100])
     all_items.sort(
         key=lambda x: x["_dt"] or datetime.datetime.min.replace(tzinfo=datetime.timezone.utc),
         reverse=True,
     )
     kept = min(len(all_items), MAX_ITEMS_TOTAL)
-    log.info("Total after dedupe: %d; keeping top %d", len(all_items), kept)
+    log.info("Total after dedupe + trust filter: %d; keeping top %d", len(all_items), kept)
 
     if not all_items:
         log.warning("Zero items fetched — leaving dashboard untouched")
