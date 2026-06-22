@@ -4,6 +4,9 @@
   "outputDirectory": ".",
   "framework": null,
   "cleanUrls": true,
+  "crons": [
+    { "path": "/api/refresh", "schedule": "30 3 * * 1" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
