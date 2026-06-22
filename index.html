@@ -1233,7 +1233,114 @@ const GRANTS = [
     value: 'Up to USD 25,000', domain: 'Sustainable travel, climate resilience, community-driven solutions',
     eligibility: 'ASEAN-based or ASEAN-led social enterprises (requires regional entity)',
     url: 'https://www2.fundsforngos.org/community-development/open-call-grants-to-support-asean-changemakers/',
-    notes: 'Low ticket. Only viable if Bambrew sets up ASEAN entity or has ASEAN-registered co-applicant.', cycleMonths: 12 }
+    notes: 'Low ticket. Only viable if Bambrew sets up ASEAN entity or has ASEAN-registered co-applicant.', cycleMonths: 12 },
+
+  // === India — Bamboo-Specific ===
+  { id: 'nbm', name: 'National Bamboo Mission (NBM) — Processing & Value Addition', region: 'india', type: 'rolling',
+    value: 'Up to 50% of project cost (max ₹1.5 cr for processing units)', domain: 'Bamboo processing, product development, value addition',
+    eligibility: 'Indian enterprises engaged in bamboo processing / product manufacturing',
+    url: 'https://nbm.nic.in/',
+    notes: 'Highest-priority missing grant. Ministry of Agriculture & Farmers Welfare. Covers machinery, infrastructure, bamboo-based product R&D. Directly funds Bambrew\'s core — bamboo → packaging value chain. Apply via state nodal agency.' },
+
+  { id: 'kvic-bamboo', name: 'KVIC Bamboo & Coir Sector Grants (PMEGP / SFURTI)', region: 'india', type: 'rolling',
+    value: 'Up to ₹50 lakh (SFURTI cluster grant)', domain: 'Bamboo cottage industry, artisan clusters, value-added bamboo products',
+    eligibility: 'Indian MSMEs / clusters in bamboo-based manufacturing',
+    url: 'https://www.kviconline.gov.in/',
+    notes: 'KVIC SFURTI scheme funds bamboo clusters. PMEGP gives 15–35% capital subsidy for bamboo-based enterprise. Bambrew could leverage for artisan supply-chain integration.' },
+
+  // === India — Innovation & Startup Awards ===
+  { id: 'nsa-2026', name: 'DPIIT National Startup Awards 2026', region: 'india', type: 'cyclical',
+    value: '₹5 lakh (category winner) + recognition', domain: 'Startup innovation across sectors incl. sustainability & circular economy',
+    eligibility: 'DPIIT-recognised Indian startups',
+    url: 'https://www.startupindia.gov.in/nsa',
+    deadline: '2026-09-30',
+    notes: 'Annual awards; FY26 cycle typically opens Jul–Sep. Bambrew qualifies under Sustainable Development / Environment category. Recognition drives investor visibility.', cycleMonths: 12 },
+
+  { id: 'nif-biennial', name: 'NIF Biennial National Competition for Grassroots Innovation', region: 'india', type: 'cyclical',
+    value: 'Up to ₹10 lakh (National Award)', domain: 'Grassroots innovation; frugal / sustainable materials innovation',
+    eligibility: 'Indian innovators, MSMEs, individuals',
+    url: 'https://www.nifindia.org/',
+    notes: 'National Innovation Foundation (DST body). Biennial cycle — last was 2024, next likely 2026. Material innovation in agri-waste / bamboo fits well.', cycleMonths: 24 },
+
+  { id: 'dst-wtw', name: 'DST Waste to Wealth Mission (WTW)', region: 'india', type: 'rolling',
+    value: 'Project-specific (up to ₹5 cr for technology projects)', domain: 'Waste valorisation → biopolymers, compostables, green materials',
+    eligibility: 'Indian research institutions + industry partners',
+    url: 'https://www.dst.gov.in/waste-wealth-mission',
+    notes: 'DST-led mission to convert waste streams to valuable products. Agri-waste → biopolymer / packaging is a perfect fit. Requires industry–academia consortium.' },
+
+  { id: 'gita', name: 'GITA Bilateral R&D Grants (Indo-German / Indo-Canadian / Indo-Korean)', region: 'india', type: 'rolling',
+    value: '₹1–5 cr per project (bilateral share)', domain: 'Technology development in sustainability, materials, clean-tech',
+    eligibility: 'Indian company + foreign partner (Germany / Canada / Korea / Netherlands / Sweden / Australia)',
+    url: 'https://www.gita.org.in/',
+    notes: 'GITA manages 9+ bilateral programs. Indo-German (BMBF+DST) and Indo-Korean (KOITA+DST) tracks are most active for materials. Requires matching foreign co-applicant.' },
+
+  { id: 'msins', name: 'Maharashtra State Innovation Society (MSInS) — Innovation Grant', region: 'india', type: 'cyclical',
+    value: 'Up to ₹25 lakh', domain: 'Innovation in manufacturing, sustainability, materials',
+    eligibility: 'Startups / MSMEs registered or operating in Maharashtra',
+    url: 'https://msins.in/',
+    notes: 'State-level grant — low competition relative to national schemes. Bambrew\'s manufacturing operations in Maharashtra make this directly applicable.', cycleMonths: 12 },
+
+  { id: 'cii-greenco', name: 'CII GreenCo Certification + Scale-Up Grant', region: 'india', type: 'rolling',
+    value: 'Recognition + access to CII sustainability ecosystem', domain: 'Green manufacturing, circular economy, sustainable supply chains',
+    eligibility: 'Indian manufacturers pursuing green certification',
+    url: 'https://www.cii.in/SectorPage.aspx?enc=oL1L9NHPtHhH8V1cGIfwlA==',
+    notes: 'CII GreenCo rating boosts B2B credibility with large CPG buyers (Marico, HUL, ITC). Some state govts offer linked financial incentives for GreenCo-rated units.' },
+
+  { id: 'villgro', name: 'Villgro Innovations Foundation — Social Incubation', region: 'india', type: 'rolling',
+    value: '₹25–75 lakh non-dilutive grant + incubation support', domain: 'Social enterprises in agriculture, livelihoods, environment',
+    eligibility: 'Indian social enterprises with rural / farmer-linked impact',
+    url: 'https://villgro.org/',
+    notes: 'Bambrew\'s bamboo supply-chain impact on rural growers fits Villgro\'s mandate. Non-dilutive; also gives access to their CIIE.CO co-investment network.' },
+
+  // === Global / Multilateral — Packaging & Plastics ===
+  { id: 'emf-npe', name: 'Ellen MacArthur Foundation — New Plastics Economy Innovation Prize', region: 'global', type: 'cyclical',
+    value: 'Up to USD 1 million (prize + recognition)', domain: 'Plastic alternatives, circular packaging, compostable solutions',
+    eligibility: 'Global; startups and scaleups',
+    url: 'https://www.ellenmacarthurfoundation.org/',
+    notes: 'Top global recognition for plastic-alternative packaging. Previous winners include compostable and plant-based packaging companies. Strong investor signal.', cycleMonths: 12 },
+
+  { id: 'circulate-capital', name: 'Circulate Capital Ocean Fund (CCOF)', region: 'multilateral', type: 'rolling',
+    value: 'USD 1–10M equity/debt (not pure grant, but blended)', domain: 'Plastic waste prevention and alternatives in South & Southeast Asia',
+    eligibility: 'Companies operating in South/SE Asia addressing plastic pollution',
+    url: 'https://www.circulatecapital.com/',
+    notes: 'Blended finance (not pure grant). Focus on India / SE Asia plastic replacement. Backed by USAID, P&G, PepsiCo, Danone, Dow. Bambrew\'s India focus + plastic replacement thesis is a strong match.' },
+
+  { id: 'wrap-ce', name: 'WRAP Circular Economy Innovation Fund (UK)', region: 'uk', type: 'rolling',
+    value: '£50K–£500K per project', domain: 'Circular packaging, compostable materials, recycling innovation',
+    eligibility: 'UK-registered entity or UK partnership required for most calls',
+    url: 'https://wrap.org.uk/taking-action/packaging/initiatives',
+    notes: 'WRAP runs UK Plastics Pact & Circular Economy calls. Bambrew needs a UK partner entity or distributor to access directly. Worth tracking for UK market expansion plans.' },
+
+  { id: 'empack-prize', name: 'World Star Packaging Award (WPO)', region: 'global', type: 'cyclical',
+    value: 'Recognition; opens doors to brand licensing deals', domain: 'Sustainable packaging innovation',
+    eligibility: 'Global — packaging companies with products launched within past 2 years',
+    url: 'https://worldstar.org/',
+    deadline: '2027-01-31',
+    notes: 'Annual award run by the World Packaging Organisation. Win/finalist status significantly boosts B2B credibility. Low cost to enter, high visibility.', cycleMonths: 12 },
+
+  { id: 'usaid-div', name: 'USAID Development Innovation Ventures (DIV)', region: 'multilateral', type: 'rolling',
+    value: 'USD 25K–USD 15M across 3 stages', domain: 'Market-based solutions to global development challenges incl. environment',
+    eligibility: 'Global; USAID eligible countries. India qualifies.',
+    url: 'https://www.usaid.gov/div',
+    notes: 'DIV funds innovations with potential for scale. Stage 1 (USD 25–200K) is accessible for Bambrew at current scale. Apply as plastic waste / sustainable packaging solution for Base-of-Pyramid markets.' },
+
+  { id: 'shell-foundation', name: 'Shell Foundation — Climate & Clean Energy', region: 'global', type: 'rolling',
+    value: 'USD 200K–2M (non-dilutive grant + advisory)', domain: 'Clean energy, circular economy, sustainable materials',
+    eligibility: 'Social enterprises with market-based models in developing markets',
+    url: 'https://www.shellfoundation.org/',
+    notes: 'Shell Foundation funds enterprises blending commercial viability with social/environmental impact. Bambrew\'s India manufacturing + rural bamboo sourcing fits their portfolio thesis.' },
+
+  { id: 'temasek-forward', name: 'Temasek Foundation — Climate Forward', region: 'global', type: 'rolling',
+    value: 'SGD 100K–500K per grant', domain: 'Climate, sustainability, circular economy in Asia',
+    eligibility: 'Asia-focused enterprises; Singapore entity helpful but not mandatory',
+    url: 'https://www.temasekfoundation.org.sg/',
+    notes: 'Temasek Foundation actively funds Asia-based sustainable materials and circular economy ventures. Bambrew\'s India operations and bamboo supply chain are a thematic fit.' },
+
+  { id: 'accenture-sustainability', name: 'Accenture Sustainability Innovation Challenge', region: 'global', type: 'cyclical',
+    value: 'USD 50K prize + Accenture partnership + investor access', domain: 'Sustainability technology innovation',
+    eligibility: 'Global early-to-growth stage startups',
+    url: 'https://www.accenture.com/in-en/services/sustainability/innovation',
+    notes: 'Annual challenge. Winners get Accenture pilot opportunities and investor intros. Strong for B2B SaaS + hardware sustainability — Bambrew\'s packaging product fits the hardware track.', cycleMonths: 12 },
 ];
 
 // ============================================================
