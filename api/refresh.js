@@ -1,6 +1,8 @@
 // Vercel cron: runs every Monday at 9am IST (3:30 UTC)
-// Fetches Google News for grant-related keywords, updates AUTO_DISCOVERED_GRANTS
-// in index.html via GitHub API, then Vercel auto-deploys.
+// Fetches Google News for grant-related keywords, saves to KV.
+// No GitHub push / redeploy needed — frontend reads from /api/auto-grants.
+
+import { kv } from '@vercel/kv';
 
 const KEYWORDS = [
   'Bambrew sustainable packaging',
@@ -43,7 +45,6 @@ const GRANT_TOKENS = ['grant','scheme','fund ','funding','challenge','prize','ca
   'non-dilutive','incubator','accelerator','cohort'];
 const RELEVANCE_TOKENS = ['sustainab','compost','biodegrad','biopolymer','bioplastic','circular',
   'plastic','packaging','bio-econom','biomanufactur','climate','cleantech','green'];
-
 const TRUSTED = ['economic times','business standard','mint','livemint','financial express',
   'businessline','moneycontrol','ndtv','bloomberg','reuters','times of india','india today',
   'inc42','yourstory','entrackr','vccircle','techcrunch','fortune india','business today',
@@ -82,7 +83,6 @@ function parseRSS(xml) {
   }
   return items;
 }
-
 async function fetchKeyword(kw) {
   const url = `https://news.google.com/rss/search?q=${encodeURIComponent(kw)}&hl=en-IN&gl=IN&ceid=IN:en`;
   try {
@@ -93,27 +93,17 @@ async function fetchKeyword(kw) {
 }
 
 export default async function handler(req, res) {
-  // Allow GET (cron) and POST (manual trigger)
-  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-  const REPO = 'akshara6126/bambrew-grants';
-
-  if (!GITHUB_TOKEN) return res.status(500).json({ error: 'GITHUB_TOKEN not set' });
-
   try {
-    // 1. Fetch all keywords (with concurrency limit)
-    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30 days
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
     const results = [];
     for (let i = 0; i < KEYWORDS.length; i += 5) {
-      const batch = KEYWORDS.slice(i, i + 5);
-      const items = await Promise.all(batch.map(fetchKeyword));
+      const items = await Promise.all(KEYWORDS.slice(i, i + 5).map(fetchKeyword));
       results.push(...items.flat());
     }
 
-    // 2. Deduplicate by link
     const seen = new Set();
     const unique = results.filter(x => { if (seen.has(x.link)) return false; seen.add(x.link); return true; });
 
-    // 3. Filter: trusted + recent + looks like a grant
     const filtered = unique.filter(x => {
       if (!isTrusted(x.source)) return false;
       if (x.pubDate && new Date(x.pubDate).getTime() < cutoff) return false;
@@ -121,53 +111,25 @@ export default async function handler(req, res) {
     });
 
     filtered.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
-    const top = filtered.slice(0, 12);
-
-    // 4. Build JS entries
     const today = new Date().toISOString().slice(0, 10);
-    const entries = top.map(x => {
-      const id = makeId(x.link);
-      const name = x.title.replace(/'/g, "\\'").replace(/\n/g, ' ');
-      const url = x.link.replace(/'/g, '%27');
-      const disc = x.pubDate ? new Date(x.pubDate).toISOString().slice(0, 10) : today;
-      return `  { id: '${id}', name: '${name}', region: 'india', type: 'deadline', value: 'See source', domain: 'Auto-detected from news headline', eligibility: 'Visit source link to verify eligibility', url: '${url}', notes: 'Auto-discovered from news on ${disc}', discoveredOn: '${disc}', autoDiscovered: true }`;
-    });
 
-    const block = `// __AUTO_GRANTS_START__\nconst AUTO_DISCOVERED_GRANTS = [\n${entries.join(',\n')},\n];\n// __AUTO_GRANTS_END__`;
+    const grants = filtered.slice(0, 12).map(x => ({
+      id: makeId(x.link),
+      name: x.title,
+      region: 'india',
+      type: 'deadline',
+      value: 'See source',
+      domain: 'Auto-detected from news headline',
+      eligibility: 'Visit source link to verify eligibility',
+      url: x.link,
+      notes: `Auto-discovered from news on ${x.pubDate ? new Date(x.pubDate).toISOString().slice(0,10) : today}`,
+      discoveredOn: x.pubDate ? new Date(x.pubDate).toISOString().slice(0, 10) : today,
+      autoDiscovered: true,
+    }));
 
-    // 5. Fetch current index.html from GitHub
-    const ghHeaders = { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
-    const fileRes = await fetch(`https://api.github.com/repos/${REPO}/contents/index.html`, { headers: ghHeaders });
-    const fileData = await fileRes.json();
-    const currentContent = Buffer.from(fileData.content, 'base64').toString('utf8');
+    await kv.set('auto-grants', { grants, updatedAt: today });
 
-    // 6. Replace the auto-grants block
-    const updated = currentContent.replace(
-      /\/\/ __AUTO_GRANTS_START__[\s\S]*?\/\/ __AUTO_GRANTS_END__/,
-      block
-    );
-
-    if (updated === currentContent && top.length === 0) {
-      return res.json({ ok: true, message: 'No new grants found', count: 0 });
-    }
-
-    // 7. Push to GitHub → triggers Vercel deploy
-    const pushRes = await fetch(`https://api.github.com/repos/${REPO}/contents/index.html`, {
-      method: 'PUT',
-      headers: ghHeaders,
-      body: JSON.stringify({
-        message: `chore: auto-refresh grants (${today})`,
-        content: Buffer.from(updated).toString('base64'),
-        sha: fileData.sha,
-      }),
-    });
-
-    if (!pushRes.ok) {
-      const err = await pushRes.json();
-      return res.status(500).json({ error: 'GitHub push failed', detail: err });
-    }
-
-    return res.json({ ok: true, count: top.length, date: today });
+    return res.json({ ok: true, count: grants.length, date: today });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }

@@ -1306,24 +1306,37 @@ const TYPE_LABELS = {
 let userState        = {};
 let userGrants       = [];
 let dismissedAutoIds = [];
+let kvAutoGrants     = [];
+let kvAutoUpdatedAt  = null;
 
 async function loadStateFromServer() {
   try {
-    const r = await fetch('/api/state', { cache: 'no-store' });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const s = await r.json();
+    const [stateRes, agRes] = await Promise.all([
+      fetch('/api/state', { cache: 'no-store' }),
+      fetch('/api/auto-grants', { cache: 'no-store' }),
+    ]);
+    if (!stateRes.ok) throw new Error('HTTP ' + stateRes.status);
+    const s = await stateRes.json();
     userState        = s.userState        || {};
     userGrants       = s.userGrants       || [];
     dismissedAutoIds = s.dismissedAutoIds || [];
-    // mirror to localStorage so reads still work if KV is briefly down
     localStorage.setItem('bambrew-grants',          JSON.stringify(userState));
     localStorage.setItem('bambrew-user-grants',     JSON.stringify(userGrants));
     localStorage.setItem('bambrew-dismissed-auto',  JSON.stringify(dismissedAutoIds));
+    if (agRes.ok) {
+      const ag = await agRes.json();
+      kvAutoGrants    = ag.grants     || [];
+      kvAutoUpdatedAt = ag.updatedAt  || null;
+      localStorage.setItem('bambrew-auto-grants', JSON.stringify(ag));
+    }
   } catch (e) {
     console.warn('Shared-state load failed, using localStorage fallback:', e);
     userState        = JSON.parse(localStorage.getItem('bambrew-grants')          || '{}');
     userGrants       = JSON.parse(localStorage.getItem('bambrew-user-grants')     || '[]');
     dismissedAutoIds = JSON.parse(localStorage.getItem('bambrew-dismissed-auto')  || '[]');
+    const ag         = JSON.parse(localStorage.getItem('bambrew-auto-grants')     || '{}');
+    kvAutoGrants     = ag.grants    || [];
+    kvAutoUpdatedAt  = ag.updatedAt || null;
   }
 }
 
@@ -1357,9 +1370,8 @@ function saveDismissed() {
 }
 
 function autoGrants() {
-  if (typeof AUTO_DISCOVERED_GRANTS === 'undefined') return [];
-  // hide ones the user dismissed, and ones older than 30 days
-  return AUTO_DISCOVERED_GRANTS.filter(g => {
+  const source = kvAutoGrants.length > 0 ? kvAutoGrants : (typeof AUTO_DISCOVERED_GRANTS !== 'undefined' ? AUTO_DISCOVERED_GRANTS : []);
+  return source.filter(g => {
     if (dismissedAutoIds.includes(g.id)) return false;
     if (g.discoveredOn) {
       const ageDays = daysBetween(new Date(g.discoveredOn), TODAY);
@@ -2005,11 +2017,12 @@ document.addEventListener('keydown', e => {
 function renderLastRefresh() {
   const el = document.getElementById('last-refresh');
   if (!el) return;
-  if (typeof LAST_REFRESH === 'undefined' || !LAST_REFRESH) {
+  const refreshDate = kvAutoUpdatedAt || (typeof LAST_REFRESH !== 'undefined' ? LAST_REFRESH : null);
+  if (!refreshDate) {
     el.innerHTML = '<span style="color:#fdecc8;">⚠ Auto-refresh has never run</span>';
     return;
   }
-  const last = new Date(LAST_REFRESH.replace(' ', 'T'));
+  const last = new Date(refreshDate.replace(' ', 'T'));
   const days = Math.floor((TODAY - last) / 86400000);
   const stamp = last.toLocaleDateString('en-IN', { day:'2-digit', month:'short' }) +
                 ' ' + last.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
