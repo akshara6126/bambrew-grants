@@ -1488,11 +1488,10 @@ function autoGrants() {
   });
 }
 
-// Main table only shows VERIFIED grants (curated + user-added).
-// Auto-discovered grants are quarantined in the Review Queue
-// — they only join allGrants() after the user explicitly clicks ✓ Keep.
-function allGrants() { return GRANTS.concat(userGrants); }
-function pendingReviewGrants() { return autoGrants(); }
+// Auto-discovered grants appear in the main table directly.
+// Users can dismiss individual ones; the weekly cron keeps it fresh automatically.
+function allGrants() { return GRANTS.concat(autoGrants()).concat(userGrants); }
+function pendingReviewGrants() { return []; }
 function isUserAdded(id) { return userGrants.some(g => g.id === id); }
 function isAutoDiscovered(id) { return autoGrants().some(g => g.id === id); }
 function removeUserGrant(id) {
@@ -1707,10 +1706,10 @@ function renderTiles() {
       <div class="value">${upcoming90}</div>
       <div class="sub">click to view list →</div>
     </div>
-    <div class="tile amber clickable" onclick="openReviewQueue()" title="Click to review auto-discovered grants before they enter your tracker">
-      <div class="label">🤖 Review queue</div>
-      <div class="value">${pendingReviewGrants().length}</div>
-      <div class="sub">click to verify →</div>
+    <div class="tile amber">
+      <div class="label">🤖 Auto-discovered</div>
+      <div class="value">${autoGrants().length}</div>
+      <div class="sub">refreshed weekly · dismiss unwanted</div>
     </div>
     <div class="tile amber">
       <div class="label">Stale · need re-check</div>
@@ -1840,15 +1839,14 @@ function renderList() {
       <tr ${isAuto ? 'style="background:#fffaeb;"' : ''}>
         <td class="grant-name">
           <span style="cursor:pointer;" onclick="openModal('${g.id}')">${g.name}</span>
-          ${isAuto ? '<span class="grant-flag" style="margin-left:6px;">🤖 Auto-discovered · needs review</span>' : ''}
+          ${isAuto ? '<span class="grant-flag" style="margin-left:6px;">🤖 Auto-discovered</span>' : ''}
           ${g.url ? `<a href="${g.url}" target="_blank">${g.url.replace('https://', '').replace('http://', '').replace(/\/+$/, '')}</a>` : ''}
           <div class="quick-actions">
             ${g.url ? `<a class="qa-btn" href="${g.url}" target="_blank" title="Open the grant's official website">🌐 Site</a>` : ''}
             <a class="qa-btn" href="${newsSearchUrl(g.name)}" target="_blank" title="Search Google News for the latest mentions">🔍 News</a>
             <a class="qa-btn" href="${googleSearchUrl(g.name)}" target="_blank" title="Google search for the grant + 2026 deadline">🔎 Web</a>
             <button class="qa-btn verify" onclick="verifyGrant('${g.id}')" title="Mark as checked today">✓ Verify</button>
-            ${isAuto ? `<button class="qa-btn verify" onclick="promoteAutoGrant('${g.id}')" title="Confirm — move to permanent list">✓ Keep</button>` : ''}
-            ${isAuto ? `<button class="qa-btn" style="color:#842121;border-color:#fadcdc;" onclick="dismissAutoGrant('${g.id}')" title="Dismiss — not actually a grant">✗ Dismiss</button>` : ''}
+            ${isAuto ? `<button class="qa-btn" style="color:#842121;border-color:#fadcdc;" onclick="dismissAutoGrant('${g.id}')" title="Dismiss — not a relevant grant">✗ Dismiss</button>` : ''}
             ${isUserAdded(g.id) ? `<button class="qa-btn" style="color:#842121;border-color:#fadcdc;" onclick="removeUserGrant('${g.id}')" title="Remove this user-added grant">✗ Remove</button>` : ''}
           </div>
           ${freshnessPill(g.id)}
