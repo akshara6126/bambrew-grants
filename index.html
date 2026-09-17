@@ -422,6 +422,40 @@
   }
   .view-toggle button.active { background: #2a8f5e; color: #fff; }
 
+  /* === Category tabs (Grants / Awards) === */
+  .category-tabs {
+    display: flex;
+    gap: 2px;
+    background: #0f2a1e;
+    padding: 0 24px;
+  }
+  .category-tabs button {
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    padding: 13px 22px 11px;
+    cursor: pointer;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: -0.01em;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .category-tabs button:hover { color: rgba(255,255,255,0.9); }
+  .category-tabs button.active {
+    color: #fff;
+    border-bottom-color: #7BC9DA;
+  }
+  .category-tabs button .tab-count {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    color: inherit;
+    opacity: 0.75;
+    margin-left: 6px;
+  }
+
   /* === View containers === */
   .view { display: none; }
   .view.active { display: block; }
@@ -836,6 +870,11 @@
   </div>
 </div>
 
+<div class="category-tabs">
+  <button id="tab-grant" onclick="setCategory('grant')">Grants<span class="tab-count" id="tab-count-grant"></span></button>
+  <button id="tab-award" onclick="setCategory('award')">Awards<span class="tab-count" id="tab-count-award"></span></button>
+</div>
+
 <!-- Drawer (hidden until hamburger click) -->
 <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
 <aside class="drawer" id="drawer" aria-label="What's New drawer">
@@ -959,47 +998,47 @@
 // ============================================================
 const GRANTS = [
   // === India ===
-  { id: 'bioe3', name: 'BioE3 Policy (BIRAC)', region: 'india', type: 'deadline',
+  { id: 'bioe3', name: 'BioE3 Policy (BIRAC)', region: 'india', type: 'deadline', category: 'grant',
     value: 'Varies', domain: 'Bio-manufacturing umbrella; biopolymers',
     eligibility: 'Indian biotech / bio-manufacturing entities; biopolymer SKUs qualify',
     url: 'https://birac.nic.in/cfp.php',
     launch: '2025-11-21', deadline: '2026-06-30',
     notes: 'Highest strategic fit; मूलांकुर hubs under this policy', cycleMonths: 12 },
 
-  { id: 'birac-big', name: 'BIRAC BIG (Biotechnology Ignition Grant)', region: 'india', type: 'cyclical',
+  { id: 'birac-big', name: 'BIRAC BIG (Biotechnology Ignition Grant)', region: 'india', type: 'cyclical', category: 'grant',
     value: 'Up to ₹50 lakh', domain: 'Biotech innovation with commercialisation potential',
     eligibility: 'Indian biotech startups; TRL 4+',
     url: 'https://birac.nic.in/big.php',
     launch: '2026-07-01', deadline: '2026-07-31',
     notes: 'Biannual: 1 Jan and 1 Jul calls each year. Next call opens 1 Jul 2026.', cycleMonths: 6 },
 
-  { id: 'birac-bipp', name: 'BIRAC BIPP', region: 'india', type: 'rolling',
+  { id: 'birac-bipp', name: 'BIRAC BIPP', region: 'india', type: 'rolling', category: 'grant',
     value: 'Up to ₹5 cr (equity/grant mix)', domain: 'Industry-academia biotech partnerships',
     eligibility: 'Indian biotech firms partnered with R&D institute',
     url: 'https://birac.nic.in/',
     notes: 'Useful if Bambrew formalises an IIT/IISc/CFTRI partnership' },
 
-  { id: 'birac-rdi', name: 'BIRAC RDI Fund', region: 'india', type: 'rolling',
+  { id: 'birac-rdi', name: 'BIRAC RDI Fund', region: 'india', type: 'rolling', category: 'grant',
     value: '₹2,000 cr (5-yr pool)', domain: 'Translational → growth-stage biotech',
     eligibility: 'Indian biotech ventures across stages',
     url: 'https://birac.nic.in/',
     tdb: false,
     notes: 'New fund (2026); grants, equity, quasi-equity, long-term debt blends. Note: DST approved BIRAC + TDB as joint fund managers for the broader ₹1T RDI Scheme, but BIRAC manages the biotech tranche — this is NOT TDB-issued.' },
 
-  { id: 'ccamp-coe', name: 'C-CAMP CoE Sustainability & Climate Action', region: 'india', type: 'cyclical',
+  { id: 'ccamp-coe', name: 'C-CAMP CoE Sustainability & Climate Action', region: 'india', type: 'cyclical', category: 'grant',
     value: 'Up to ₹50 lakh', domain: 'Sustainability, circular economy, climate',
     eligibility: 'Indian startups in sustainability / climate',
     url: 'https://www.ccamp.res.in/',
     launch: '2026-02-17', deadline: '2026-04-01',
     notes: '2026 cycle is past — track for 2027 cycle (~Feb 2027 announcement, ~Apr 2027 deadline).', cycleMonths: 12 },
 
-  { id: 'ccamp-win', name: 'C-CAMP WIN CoE (Non-Dilutive)', region: 'india', type: 'rolling',
+  { id: 'ccamp-win', name: 'C-CAMP WIN CoE (Non-Dilutive)', region: 'india', type: 'rolling', category: 'grant',
     value: 'Non-dilutive (varies)', domain: 'Innovation; bio-manufacturing',
     eligibility: 'Indian deep-tech / bio-manufacturing',
     url: 'https://www.ccamp.res.in/',
     notes: 'Equity-friendly; aligns with scale-up stage.' },
 
-  { id: 'tdb-finland', name: 'TDB India–Finland Joint Innovation Call 2026', region: 'india', type: 'deadline',
+  { id: 'tdb-finland', name: 'TDB India–Finland Joint Innovation Call 2026', region: 'india', type: 'deadline', category: 'grant',
     value: '₹2.5 cr', domain: 'Bilateral tech collaboration (circular & climate)',
     eligibility: 'Indian company + Finnish partner consortium',
     url: 'https://www.tdb.gov.in/',
@@ -1007,336 +1046,336 @@ const GRANTS = [
     tdb: true,
     notes: 'Needs Finnish co-applicant; partner-mapping required. Closes at 16:00 IST.', cycleMonths: 12 },
 
-  { id: 'nidhi-prayas', name: 'DST NIDHI PRAYAS Cohort 3.0', region: 'india', type: 'cyclical',
+  { id: 'nidhi-prayas', name: 'DST NIDHI PRAYAS Cohort 3.0', region: 'india', type: 'cyclical', category: 'grant',
     value: '₹10 lakh prototype grant', domain: 'Prototype-stage hardtech / deeptech',
     eligibility: 'Innovators via PRAYAS Centres (TBIs)',
     url: 'https://nidhi-prayas.org/',
     launch: '2026-05-19', deadline: '2026-06-19',
     notes: 'Apply via a PRAYAS-affiliated incubator (e.g. C-CAMP, IIM-B NSRCEL).', cycleMonths: 12 },
 
-  { id: 'dst-itbi', name: 'DST-iTBI Ignition Grant (Cohort 3.0)', region: 'india', type: 'cyclical',
+  { id: 'dst-itbi', name: 'DST-iTBI Ignition Grant (Cohort 3.0)', region: 'india', type: 'cyclical', category: 'grant',
     value: 'Up to ₹10 lakh', domain: 'GreenTech / CleanTech / DeepTech',
     eligibility: 'Indian S&T startups at idea / prototype stage',
     url: 'https://www.indiascienceandtechnology.gov.in/funding-opportunities/startups',
     notes: 'Cohort-based annual call.', cycleMonths: 12 },
 
-  { id: 'sisfs', name: 'Startup India Seed Fund (SISFS)', region: 'india', type: 'cyclical',
+  { id: 'sisfs', name: 'Startup India Seed Fund (SISFS)', region: 'india', type: 'cyclical', category: 'grant',
     value: '₹20L grant + ₹50L convertible debt', domain: 'DPIIT-recognised startups, any sector',
     eligibility: 'DPIIT-recognised; <2 yrs old',
     url: 'https://seedfund.startupindia.gov.in/',
     launch: '2026-01-01', deadline: '2026-05-31',
     notes: '2026 cycle is past — next cycle ~May 2027.', cycleMonths: 12 },
 
-  { id: 'bioai', name: 'DBT-BIRAC BioE3 BioAI Call', region: 'india', type: 'deadline',
+  { id: 'bioai', name: 'DBT-BIRAC BioE3 BioAI Call', region: 'india', type: 'deadline', category: 'grant',
     value: 'Varies', domain: 'High-performance bio-manufacturing using AI',
     eligibility: 'Indian biotech + AI/ML capability',
     url: 'https://birac.nic.in/cfp.php',
     notes: 'Stretch fit — viable if Bambrew partners on data/AI for process.' },
 
-  { id: 'iit-kanpur-plastics', name: 'IIT Kanpur Plastics Innovation Challenge', region: 'india', type: 'cyclical',
+  { id: 'iit-kanpur-plastics', name: 'IIT Kanpur Plastics Innovation Challenge', region: 'india', type: 'cyclical', category: 'grant',
     value: '₹8–12 lakh', domain: 'Plastic waste & circularity (CSR-backed)',
     eligibility: 'Indian startups solving plastic-waste challenges',
     url: 'https://siic.iitk.ac.in/',
     notes: 'Lower ticket; useful for narrative + ecosystem credibility.', cycleMonths: 12 },
 
-  { id: 'elevate', name: 'ELEVATE Karnataka 2026', region: 'india', type: 'deadline',
+  { id: 'elevate', name: 'ELEVATE Karnataka 2026', region: 'india', type: 'deadline', category: 'grant',
     value: 'Up to ₹50 lakh', domain: 'Sector-agnostic; cleantech-friendly',
     eligibility: 'Karnataka-registered Pvt Ltd / LLP / OPC; ≤10 yrs old',
     url: 'https://elevate.startupkarnataka.in/',
     launch: '2026-04-15', deadline: '2026-06-25',
     notes: 'Bambrew is Karnataka-HQ\'d — direct home-state grant; milestone-based tranches.', cycleMonths: 12 },
 
-  { id: 'elevate-nxt', name: 'ELEVATE NxT (Karnataka deeptech)', region: 'india', type: 'cyclical',
+  { id: 'elevate-nxt', name: 'ELEVATE NxT (Karnataka deeptech)', region: 'india', type: 'cyclical', category: 'grant',
     value: 'Up to ₹1 cr', domain: 'Deeptech incl. green energy / sustainability',
     eligibility: 'Karnataka deeptech ventures',
     url: 'https://www.missionstartupkarnataka.org/elevate-karnataka',
     notes: '₹150 cr corpus; biopolymer-process tech qualifies as deeptech.', cycleMonths: 12 },
 
-  { id: 'anic', name: 'NITI Aayog AIM · ANIC', region: 'india', type: 'cyclical',
+  { id: 'anic', name: 'NITI Aayog AIM · ANIC', region: 'india', type: 'cyclical', category: 'grant',
     value: 'Up to ₹1 cr', domain: 'Sectoral tech innovations (circular econ in 2026 cohort)',
     eligibility: 'Indian tech startups',
     url: 'https://aim.gov.in/anic-overview.php',
     notes: '2026 cohort highlights circular economy + sustainable systems explicitly.', cycleMonths: 12 },
 
-  { id: 'marico', name: 'Marico Innovation Foundation · Indian Innovation Icons 2027', region: 'india', type: 'deadline',
+  { id: 'marico', name: 'Marico Innovation Foundation · Indian Innovation Icons 2027', region: 'india', type: 'deadline', category: 'award',
     value: 'Award + mentorship + follow-on', domain: 'Plastic waste, cleantech, agritech',
     eligibility: 'Indian innovators with game-changing impact',
     url: 'https://www.maricoinnovationfoundation.org/innovation-for-india-awards/',
     launch: '2026-06-01', deadline: '2026-06-30',
     notes: 'Email innovate@marico.com. Non-cash but brand credibility lever.', cycleMonths: 24 },
 
-  { id: 'mahindra-rise', name: 'Mahindra Rise Prize', region: 'india', type: 'cyclical',
+  { id: 'mahindra-rise', name: 'Mahindra Rise Prize', region: 'india', type: 'cyclical', category: 'award',
     value: 'Up to USD 1M', domain: 'Disruptive innovation (theme rotates)',
     eligibility: 'Global; demonstrable working tech',
     url: 'https://risechallenge.mahindra.com/',
     notes: 'Watch for sustainability/circular themes.' },
 
   // === EU / UK ===
-  { id: 'cbe-ju', name: 'Horizon Europe CBE JU 2026 — Films & coatings for circular packaging', region: 'eu', type: 'deadline',
+  { id: 'cbe-ju', name: 'Horizon Europe CBE JU 2026 — Films & coatings for circular packaging', region: 'eu', type: 'deadline', category: 'grant',
     value: '€14M topic (€170.7M call)', domain: 'Circular bio-based films & coatings',
     eligibility: 'EU consortium (typically 3+ orgs ≥3 countries); India = third country',
     url: 'https://www.cbe.europa.eu/open-calls-proposals',
     launch: '2026-04-23', deadline: '2026-09-22',
     notes: 'Sharpest international fit. Requires lining up EU consortium lead. Closes 17:00 CET.' },
 
-  { id: 'life', name: 'EU LIFE Programme 2026 — Circular Economy & Zero Pollution', region: 'eu', type: 'deadline',
+  { id: 'life', name: 'EU LIFE Programme 2026 — Circular Economy & Zero Pollution', region: 'eu', type: 'deadline', category: 'grant',
     value: '€79M topic (€2.3B prog.)', domain: 'Circular economy, zero pollution',
     eligibility: 'EU members + associated countries; SMEs, public, NGOs',
     url: 'https://cinea.ec.europa.eu/life-calls-proposals-2026_en',
     deadline: '2026-09-22',
     notes: 'Pair with CBE JU under one EU partner-mapping exercise.' },
 
-  { id: 'sspp', name: 'UK Innovate UK SSPP', region: 'uk', type: 'rolling',
+  { id: 'sspp', name: 'UK Innovate UK SSPP', region: 'uk', type: 'rolling', category: 'grant',
     value: '£200K – £4M (R&D); £1M – £12M (demo)', domain: 'Sustainable plastic packaging R&D',
     eligibility: 'UK-registered businesses',
     url: 'https://iuk-business-connect.org.uk/materials/smart-sustainable-plastic-packaging/',
     notes: 'Needs UK entity; viable via UK subsidiary or research partner.' },
 
-  { id: 'earthshot', name: 'The Earthshot Prize', region: 'global', type: 'cyclical',
+  { id: 'earthshot', name: 'The Earthshot Prize', region: 'global', type: 'cyclical', category: 'award',
     value: '£1M × 5 winners', domain: 'Waste-Free World + 4 other Earthshots',
     eligibility: 'Proven prototype with measurable environmental impact; nominated',
     url: 'https://earthshotprize.org/',
     launch: '2026-10-01', deadline: '2026-11-30',
     notes: 'Nomination window typically Oct–Nov each year. Need Official Nominator (Innovate UK / WWF India / Commonwealth Sec.).', cycleMonths: 12 },
 
-  { id: 'bezos', name: 'Bezos Earth Fund + Earthshot partnership', region: 'global', type: 'rolling',
+  { id: 'bezos', name: 'Bezos Earth Fund + Earthshot partnership', region: 'global', type: 'rolling', category: 'grant',
     value: '$4.8M pool (varies)', domain: 'Climate / nature / biodegradable bioplastics',
     eligibility: 'High-potential climate/nature innovations',
     url: 'https://www.bezosearthfund.org/',
     notes: 'Bezos Earth Fund explicitly names biodegradable bioplastics as a target.' },
 
-  { id: 'wwf-bezos', name: 'WWF + Bezos Earth Fund Climate Solutions', region: 'global', type: 'rolling',
+  { id: 'wwf-bezos', name: 'WWF + Bezos Earth Fund Climate Solutions', region: 'global', type: 'rolling', category: 'grant',
     value: 'Varies', domain: 'Climate, biodiversity, ocean',
     eligibility: 'Mission-aligned NGOs & for-profits',
     url: 'https://www.worldwildlife.org/our-work/funds/bezos-earth-fund/',
     notes: 'Often routed via WWF country offices; WWF India is the entry point.' },
 
-  { id: 'amazon-acc', name: 'Amazon Sustainability Accelerator (with EIT Climate-KIC)', region: 'global', type: 'cyclical',
+  { id: 'amazon-acc', name: 'Amazon Sustainability Accelerator (with EIT Climate-KIC)', region: 'global', type: 'cyclical', category: 'grant',
     value: 'Mentorship + Europe-wide pilot', domain: 'Reusable / sustainable e-commerce packaging',
     eligibility: 'European startups (currently)',
     url: 'https://sustainability.aboutamazon.com/operations/the-climate-pledge-fund/sustainability-accelerator',
     notes: 'Not directly applicable now — watch for Asia expansion.', cycleMonths: 12 },
 
-  { id: 'climate-kic', name: 'EIT Climate-KIC calls', region: 'eu', type: 'rolling',
+  { id: 'climate-kic', name: 'EIT Climate-KIC calls', region: 'eu', type: 'rolling', category: 'grant',
     value: 'Varies', domain: 'Climate innovation; circular economy',
     eligibility: 'Mostly EU-based; accepts non-EU partners',
     url: 'https://www.climate-kic.org/',
     notes: 'Strong network value even where direct funding is EU-only.' },
 
-  { id: 'gcf', name: 'Green Climate Fund (GCF) · Private Sector Facility', region: 'multilateral', type: 'rolling',
+  { id: 'gcf', name: 'Green Climate Fund (GCF) · Private Sector Facility', region: 'multilateral', type: 'rolling', category: 'grant',
     value: 'SAP up to USD 25M; PAP > USD 250M', domain: 'Climate mitigation & adaptation',
     eligibility: 'Indian for-profit as project executor; NABARD packages as DAE',
     url: 'https://www.greenclimate.fund/countries/india',
     notes: 'India route: via NABARD as Direct Access Entity. Largest single climate-finance window globally.' },
 
-  { id: 'ifc', name: 'World Bank / IFC Climate & Circular Economy Finance', region: 'multilateral', type: 'rolling',
+  { id: 'ifc', name: 'World Bank / IFC Climate & Circular Economy Finance', region: 'multilateral', type: 'rolling', category: 'grant',
     value: 'USD 5–50M (project-specific)', domain: 'Climate, circular economy, sustainable manufacturing',
     eligibility: 'For-profits with scalable climate-positive models',
     url: 'https://www.ifc.org/en/what-we-do/sector-expertise/climate-business',
     notes: 'IFC India has active circular-economy mandate; engage with concept note.' },
 
-  { id: 'adb', name: 'ADB Ventures / ADB Climate Investment Funds', region: 'multilateral', type: 'rolling',
+  { id: 'adb', name: 'ADB Ventures / ADB Climate Investment Funds', region: 'multilateral', type: 'rolling', category: 'grant',
     value: 'Up to USD 4M (ADB Ventures)', domain: 'Climate-tech, circular economy',
     eligibility: 'Climate-tech startups in ADB Asia-Pacific (India eligible)',
     url: 'https://www.adbventures.com/',
     notes: 'Equity-heavy + technical-assistance grants.' },
 
-  { id: 'ikea-ceic', name: 'IKEA Foundation · CEIC Bengaluru', region: 'global', type: 'cyclical',
+  { id: 'ikea-ceic', name: 'IKEA Foundation · CEIC Bengaluru', region: 'global', type: 'cyclical', category: 'grant',
     value: 'Up to €50,000', domain: 'Circular economy + social impact in Bengaluru',
     eligibility: 'Entrepreneurship Support Orgs (ESOs) in Bengaluru',
     url: 'https://ikeafoundation.org/grants/circular-economy-catalyst/',
     launch: '2026-04-01', deadline: '2026-07-31',
     notes: 'Bengaluru-specific. Masterclasses Apr–Jul 2026 followed by grant round.', cycleMonths: 12 },
 
-  { id: 'ikea-ande', name: 'IKEA Foundation + ANDE Waste & Circularity IIF', region: 'global', type: 'cyclical',
+  { id: 'ikea-ande', name: 'IKEA Foundation + ANDE Waste & Circularity IIF', region: 'global', type: 'cyclical', category: 'grant',
     value: 'Grant pool for SGBs', domain: 'Waste management & circular economy',
     eligibility: 'SGBs in India and Kenya; routed via ANDE members',
     url: 'https://andeglobal.org/climate-and-environmental-action/access-to-green-finance/',
     notes: 'Now in second round of grantees.' },
 
-  { id: 'aws-climate', name: 'AWS Compute for Climate Fellowship', region: 'global', type: 'cyclical',
+  { id: 'aws-climate', name: 'AWS Compute for Climate Fellowship', region: 'global', type: 'cyclical', category: 'grant',
     value: 'Share of $4M AWS credits', domain: 'Climate solutions using cloud + compute',
     eligibility: 'Climate-focused startups with 2-3 month buildable projects',
     url: 'https://aws.amazon.com/startups/learn/compute-for-climate-fellowship',
     notes: '2026 cohort active. Credits not cash.', cycleMonths: 12 },
 
-  { id: 'msft-cif', name: 'Microsoft Climate Innovation Fund', region: 'global', type: 'rolling',
+  { id: 'msft-cif', name: 'Microsoft Climate Innovation Fund', region: 'global', type: 'rolling', category: 'grant',
     value: 'USD 1–25M equity', domain: 'Climate-tech with early commercial traction',
     eligibility: 'Revenue / commercial traction needed',
     url: 'https://www.microsoft.com/en-us/corporate-responsibility/sustainability/climate-innovation-fund',
     notes: 'Equity vehicle not grant; useful at revenue scale.' },
 
-  { id: 'undp-plastic', name: 'UNDP India · Plastic Waste Management Programme', region: 'multilateral', type: 'rolling',
+  { id: 'undp-plastic', name: 'UNDP India · Plastic Waste Management Programme', region: 'multilateral', type: 'rolling', category: 'grant',
     value: 'Programme-funded', domain: 'Plastics circularity, segregation, recycling MRFs',
     eligibility: 'NGOs & for-profits aligned with UNDP framework',
     url: 'https://www.undp.org/india/projects/plastic-waste-management',
     notes: 'Partner-mode entry; proposal direct to UNDP India.' },
 
-  { id: 'nabard-ngif', name: 'NABARD Green Impact Fund (NGIF) + Carbon Fund (NCF)', region: 'india', type: 'rolling',
+  { id: 'nabard-ngif', name: 'NABARD Green Impact Fund (NGIF) + Carbon Fund (NCF)', region: 'india', type: 'rolling', category: 'grant',
     value: '₹1,000 cr (NGIF) + ₹300 cr (NCF)', domain: 'Sustainable farming, climate adaptation, emissions reduction, carbon capture',
     eligibility: 'Climate-tech / agritech startups; carbon developers; bio-manufacturing applicable',
     url: 'https://www.nabard.org/climate-actions.aspx',
     notes: 'NEW (Jan 2026 launch). NABARD in talks with World Bank & Gates Foundation for co-investment. Interest income reduces borrowing costs for implementing agencies.' },
 
-  { id: 'ciic-2026', name: 'Climate Impact Innovations Challenge (CIIC) 2026 · Indonesia', region: 'global', type: 'deadline',
+  { id: 'ciic-2026', name: 'Climate Impact Innovations Challenge (CIIC) 2026 · Indonesia', region: 'global', type: 'deadline', category: 'award',
     value: 'Rp 15 cr (~USD 925K) prize pool + USD 1M carbon credits to finalists', domain: 'Circular economy track: waste & water circularity, climate adaptation',
     eligibility: 'GLOBALLY OPEN. MVP with commercialisation intent required. Winning solution must be piloted in Indonesia (local partner OK).',
     url: 'https://climateimpactinnovations.com/',
     launch: '2026-04-08', deadline: '2026-06-20',
     notes: 'Backed by East Ventures + Temasek Foundation + Tencent. Indonesia\'s biggest climate-tech competition. 3 tracks; Circular Economy is the direct fit for Bambrew. Closes 23:59 GMT+7.', cycleMonths: 12 },
 
-  { id: 'eco-kranti', name: 'Eco Kranti · Shubh Labh 1.0 (Bharat Startup Challenge 2026)', region: 'india', type: 'cyclical',
+  { id: 'eco-kranti', name: 'Eco Kranti · Shubh Labh 1.0 (Bharat Startup Challenge 2026)', region: 'india', type: 'cyclical', category: 'grant',
     value: 'Grant + ecosystem access (varies by track)', domain: 'Single-use plastics elimination, sustainable materials, circular economy, waste management',
     eligibility: 'Indian startups in green / circular economy categories',
     url: 'https://www.startupgrantsindia.com/',
     notes: 'NEW (2026). Directly named sub-themes include single-use plastic elimination + sustainable materials — perfect Bambrew fit.', cycleMonths: 12 },
 
-  { id: 'nsrcel-circular', name: 'NSRCEL · Circular Bharat Accelerator', region: 'india', type: 'cyclical',
+  { id: 'nsrcel-circular', name: 'NSRCEL · Circular Bharat Accelerator', region: 'india', type: 'cyclical', category: 'grant',
     value: 'Accelerator + pilot opportunities + go-to-market support', domain: 'Circular economy startups; pilot & scale-up focus',
     eligibility: 'Indian circular-economy ventures',
     url: 'https://nsrcel.org/circular-bharat-accelerator/',
     notes: 'Multi-stakeholder: NSRCEL (IIM-B) + HUL + NITI Aayog + Xynteo. Strong on pilot opportunities — HUL connection makes this a customer-acquisition channel as well.', cycleMonths: 12 },
 
-  { id: 'zayed', name: 'Zayed Sustainability Prize', region: 'global', type: 'cyclical',
+  { id: 'zayed', name: 'Zayed Sustainability Prize', region: 'global', type: 'cyclical', category: 'award',
     value: 'USD 1 million per category', domain: 'Sustainability innovation — Food, Health, Energy, Water, Climate Action categories',
     eligibility: 'Globally open. SMEs, NGOs, and high schools.',
     url: 'https://www.zayedsustainabilityprize.com/',
     launch: '2026-09-01', deadline: '2026-12-15',
     notes: 'Singapore\'s N&E Innovations won USD 1M in 2026 Food category for biodegradable food packaging — proves the fit. Annual nomination cycle Sept–Dec.', cycleMonths: 12 },
 
-  { id: 'tata-prize', name: 'Tata Transformation Prize (via NYAS)', region: 'global', type: 'cyclical',
+  { id: 'tata-prize', name: 'Tata Transformation Prize (via NYAS)', region: 'global', type: 'cyclical', category: 'award',
     value: 'Recognition + funding (varies by category)', domain: 'Sustainable agriculture, food security, environmental solutions',
     eligibility: 'India-based scientists / institutions',
     url: 'https://www.nyas.org/program-category/tata/',
     notes: 'Recognition prize + financial support. Hosted by New York Academy of Sciences with Tata backing.', cycleMonths: 12 },
 
-  { id: 'gef-9', name: 'Global Environment Facility (GEF-9 cycle)', region: 'multilateral', type: 'rolling',
+  { id: 'gef-9', name: 'Global Environment Facility (GEF-9 cycle)', region: 'multilateral', type: 'rolling', category: 'grant',
     value: 'USD 7.7B+ replenishment pool (project-specific allocations)', domain: 'Climate change, land degradation, biodiversity, chemicals & waste',
     eligibility: 'India is UNFCCC-eligible. Access via accredited Implementing Agencies (UNDP / UNEP / World Bank) or via NABARD as Direct Access Entity.',
     url: 'https://www.thegef.org/projects-operations/country-profiles/india',
     notes: 'GEF-9 runs July 2026 → June 2030. Focus on integrated programming + blended finance. Bambrew engages via in-country implementing agency.' },
 
-  { id: 'polymer-coe', name: 'Centre of Excellence Grant for Polymer Research', region: 'india', type: 'cyclical',
+  { id: 'polymer-coe', name: 'Centre of Excellence Grant for Polymer Research', region: 'india', type: 'cyclical', category: 'grant',
     value: 'Up to ₹5 cr', domain: 'Polymer research including biopolymers',
     eligibility: 'Indian R&D / startup ventures with polymer focus',
     url: 'https://www.entrepreneurindia.co/blogs/polymer-startup-funding-india/',
     tdb: false,
     notes: 'Direct R&D fit. Bambrew can apply for biopolymer-specific work (process optimisation, new grades, etc.). Funder: DST CoE scheme allocated via IITs / CSIR labs / CIPET centres — NOT TDB-issued.', cycleMonths: 12 },
 
-  { id: 'csir-comm', name: 'CSIR Tech Commercialisation Schemes (NMITLI / SETU / ASPIRE)', region: 'india', type: 'rolling',
+  { id: 'csir-comm', name: 'CSIR Tech Commercialisation Schemes (NMITLI / SETU / ASPIRE)', region: 'india', type: 'rolling', category: 'grant',
     value: 'Grant + Equity + Debt blend (varies)', domain: 'Tech commercialisation by startups & SMEs',
     eligibility: 'Indian startups commercialising research/tech',
     url: 'https://www.csir.res.in/en/rd-projects-csir',
     notes: 'CSIR publicly-funded commercialisation schemes — useful for moving biopolymer R&D to manufacturing scale.' },
 
-  { id: 'airasia', name: 'AirAsia Foundation Grant 2026', region: 'global', type: 'cyclical',
+  { id: 'airasia', name: 'AirAsia Foundation Grant 2026', region: 'global', type: 'cyclical', category: 'grant',
     value: 'Up to USD 25,000', domain: 'Sustainable travel, climate resilience, community-driven solutions',
     eligibility: 'ASEAN-based or ASEAN-led social enterprises (requires regional entity)',
     url: 'https://www2.fundsforngos.org/community-development/open-call-grants-to-support-asean-changemakers/',
     notes: 'Low ticket. Only viable if Bambrew sets up ASEAN entity or has ASEAN-registered co-applicant.', cycleMonths: 12 },
 
   // === India — Bamboo-Specific ===
-  { id: 'nbm', name: 'National Bamboo Mission (NBM) — Processing & Value Addition', region: 'india', type: 'rolling',
+  { id: 'nbm', name: 'National Bamboo Mission (NBM) — Processing & Value Addition', region: 'india', type: 'rolling', category: 'grant',
     value: 'Up to 50% of project cost (max ₹1.5 cr for processing units)', domain: 'Bamboo processing, product development, value addition',
     eligibility: 'Indian enterprises engaged in bamboo processing / product manufacturing',
     url: 'https://nbm.nic.in/',
     notes: 'Highest-priority missing grant. Ministry of Agriculture & Farmers Welfare. Covers machinery, infrastructure, bamboo-based product R&D. Directly funds Bambrew\'s core — bamboo → packaging value chain. Apply via state nodal agency.' },
 
-  { id: 'kvic-bamboo', name: 'KVIC Bamboo & Coir Sector Grants (PMEGP / SFURTI)', region: 'india', type: 'rolling',
+  { id: 'kvic-bamboo', name: 'KVIC Bamboo & Coir Sector Grants (PMEGP / SFURTI)', region: 'india', type: 'rolling', category: 'grant',
     value: 'Up to ₹50 lakh (SFURTI cluster grant)', domain: 'Bamboo cottage industry, artisan clusters, value-added bamboo products',
     eligibility: 'Indian MSMEs / clusters in bamboo-based manufacturing',
     url: 'https://www.kviconline.gov.in/',
     notes: 'KVIC SFURTI scheme funds bamboo clusters. PMEGP gives 15–35% capital subsidy for bamboo-based enterprise. Bambrew could leverage for artisan supply-chain integration.' },
 
   // === India — Innovation & Startup Awards ===
-  { id: 'nsa-2026', name: 'DPIIT National Startup Awards 2026', region: 'india', type: 'cyclical',
+  { id: 'nsa-2026', name: 'DPIIT National Startup Awards 2026', region: 'india', type: 'cyclical', category: 'award',
     value: '₹5 lakh (category winner) + recognition', domain: 'Startup innovation across sectors incl. sustainability & circular economy',
     eligibility: 'DPIIT-recognised Indian startups',
     url: 'https://www.startupindia.gov.in/nsa',
     deadline: '2026-09-30',
     notes: 'Annual awards; FY26 cycle typically opens Jul–Sep. Bambrew qualifies under Sustainable Development / Environment category. Recognition drives investor visibility.', cycleMonths: 12 },
 
-  { id: 'nif-biennial', name: 'NIF Biennial National Competition for Grassroots Innovation', region: 'india', type: 'cyclical',
+  { id: 'nif-biennial', name: 'NIF Biennial National Competition for Grassroots Innovation', region: 'india', type: 'cyclical', category: 'award',
     value: 'Up to ₹10 lakh (National Award)', domain: 'Grassroots innovation; frugal / sustainable materials innovation',
     eligibility: 'Indian innovators, MSMEs, individuals',
     url: 'https://www.nifindia.org/',
     notes: 'National Innovation Foundation (DST body). Biennial cycle — last was 2024, next likely 2026. Material innovation in agri-waste / bamboo fits well.', cycleMonths: 24 },
 
-  { id: 'dst-wtw', name: 'DST Waste to Wealth Mission (WTW)', region: 'india', type: 'rolling',
+  { id: 'dst-wtw', name: 'DST Waste to Wealth Mission (WTW)', region: 'india', type: 'rolling', category: 'grant',
     value: 'Project-specific (up to ₹5 cr for technology projects)', domain: 'Waste valorisation → biopolymers, compostables, green materials',
     eligibility: 'Indian research institutions + industry partners',
     url: 'https://www.dst.gov.in/waste-wealth-mission',
     notes: 'DST-led mission to convert waste streams to valuable products. Agri-waste → biopolymer / packaging is a perfect fit. Requires industry–academia consortium.' },
 
-  { id: 'gita', name: 'GITA Bilateral R&D Grants (Indo-German / Indo-Canadian / Indo-Korean)', region: 'india', type: 'rolling',
+  { id: 'gita', name: 'GITA Bilateral R&D Grants (Indo-German / Indo-Canadian / Indo-Korean)', region: 'india', type: 'rolling', category: 'grant',
     value: '₹1–5 cr per project (bilateral share)', domain: 'Technology development in sustainability, materials, clean-tech',
     eligibility: 'Indian company + foreign partner (Germany / Canada / Korea / Netherlands / Sweden / Australia)',
     url: 'https://www.gita.org.in/',
     notes: 'GITA manages 9+ bilateral programs. Indo-German (BMBF+DST) and Indo-Korean (KOITA+DST) tracks are most active for materials. Requires matching foreign co-applicant.' },
 
-  { id: 'msins', name: 'Maharashtra State Innovation Society (MSInS) — Innovation Grant', region: 'india', type: 'cyclical',
+  { id: 'msins', name: 'Maharashtra State Innovation Society (MSInS) — Innovation Grant', region: 'india', type: 'cyclical', category: 'grant',
     value: 'Up to ₹25 lakh', domain: 'Innovation in manufacturing, sustainability, materials',
     eligibility: 'Startups / MSMEs registered or operating in Maharashtra',
     url: 'https://msins.in/',
     notes: 'State-level grant — low competition relative to national schemes. Bambrew\'s manufacturing operations in Maharashtra make this directly applicable.', cycleMonths: 12 },
 
-  { id: 'cii-greenco', name: 'CII GreenCo Certification + Scale-Up Grant', region: 'india', type: 'rolling',
+  { id: 'cii-greenco', name: 'CII GreenCo Certification + Scale-Up Grant', region: 'india', type: 'rolling', category: 'grant',
     value: 'Recognition + access to CII sustainability ecosystem', domain: 'Green manufacturing, circular economy, sustainable supply chains',
     eligibility: 'Indian manufacturers pursuing green certification',
     url: 'https://www.cii.in/SectorPage.aspx?enc=oL1L9NHPtHhH8V1cGIfwlA==',
     notes: 'CII GreenCo rating boosts B2B credibility with large CPG buyers (Marico, HUL, ITC). Some state govts offer linked financial incentives for GreenCo-rated units.' },
 
-  { id: 'villgro', name: 'Villgro Innovations Foundation — Social Incubation', region: 'india', type: 'rolling',
+  { id: 'villgro', name: 'Villgro Innovations Foundation — Social Incubation', region: 'india', type: 'rolling', category: 'grant',
     value: '₹25–75 lakh non-dilutive grant + incubation support', domain: 'Social enterprises in agriculture, livelihoods, environment',
     eligibility: 'Indian social enterprises with rural / farmer-linked impact',
     url: 'https://villgro.org/',
     notes: 'Bambrew\'s bamboo supply-chain impact on rural growers fits Villgro\'s mandate. Non-dilutive; also gives access to their CIIE.CO co-investment network.' },
 
   // === Global / Multilateral — Packaging & Plastics ===
-  { id: 'emf-npe', name: 'Ellen MacArthur Foundation — New Plastics Economy Innovation Prize', region: 'global', type: 'cyclical',
+  { id: 'emf-npe', name: 'Ellen MacArthur Foundation — New Plastics Economy Innovation Prize', region: 'global', type: 'cyclical', category: 'award',
     value: 'Up to USD 1 million (prize + recognition)', domain: 'Plastic alternatives, circular packaging, compostable solutions',
     eligibility: 'Global; startups and scaleups',
     url: 'https://www.ellenmacarthurfoundation.org/',
     notes: 'Top global recognition for plastic-alternative packaging. Previous winners include compostable and plant-based packaging companies. Strong investor signal.', cycleMonths: 12 },
 
-  { id: 'circulate-capital', name: 'Circulate Capital Ocean Fund (CCOF)', region: 'multilateral', type: 'rolling',
+  { id: 'circulate-capital', name: 'Circulate Capital Ocean Fund (CCOF)', region: 'multilateral', type: 'rolling', category: 'grant',
     value: 'USD 1–10M equity/debt (not pure grant, but blended)', domain: 'Plastic waste prevention and alternatives in South & Southeast Asia',
     eligibility: 'Companies operating in South/SE Asia addressing plastic pollution',
     url: 'https://www.circulatecapital.com/',
     notes: 'Blended finance (not pure grant). Focus on India / SE Asia plastic replacement. Backed by USAID, P&G, PepsiCo, Danone, Dow. Bambrew\'s India focus + plastic replacement thesis is a strong match.' },
 
-  { id: 'wrap-ce', name: 'WRAP Circular Economy Innovation Fund (UK)', region: 'uk', type: 'rolling',
+  { id: 'wrap-ce', name: 'WRAP Circular Economy Innovation Fund (UK)', region: 'uk', type: 'rolling', category: 'grant',
     value: '£50K–£500K per project', domain: 'Circular packaging, compostable materials, recycling innovation',
     eligibility: 'UK-registered entity or UK partnership required for most calls',
     url: 'https://wrap.org.uk/taking-action/packaging/initiatives',
     notes: 'WRAP runs UK Plastics Pact & Circular Economy calls. Bambrew needs a UK partner entity or distributor to access directly. Worth tracking for UK market expansion plans.' },
 
-  { id: 'empack-prize', name: 'World Star Packaging Award (WPO)', region: 'global', type: 'cyclical',
+  { id: 'empack-prize', name: 'World Star Packaging Award (WPO)', region: 'global', type: 'cyclical', category: 'award',
     value: 'Recognition; opens doors to brand licensing deals', domain: 'Sustainable packaging innovation',
     eligibility: 'Global — packaging companies with products launched within past 2 years',
     url: 'https://worldstar.org/',
     deadline: '2027-01-31',
     notes: 'Annual award run by the World Packaging Organisation. Win/finalist status significantly boosts B2B credibility. Low cost to enter, high visibility.', cycleMonths: 12 },
 
-  { id: 'usaid-div', name: 'USAID Development Innovation Ventures (DIV)', region: 'multilateral', type: 'rolling',
+  { id: 'usaid-div', name: 'USAID Development Innovation Ventures (DIV)', region: 'multilateral', type: 'rolling', category: 'grant',
     value: 'USD 25K–USD 15M across 3 stages', domain: 'Market-based solutions to global development challenges incl. environment',
     eligibility: 'Global; USAID eligible countries. India qualifies.',
     url: 'https://www.usaid.gov/div',
     notes: 'DIV funds innovations with potential for scale. Stage 1 (USD 25–200K) is accessible for Bambrew at current scale. Apply as plastic waste / sustainable packaging solution for Base-of-Pyramid markets.' },
 
-  { id: 'shell-foundation', name: 'Shell Foundation — Climate & Clean Energy', region: 'global', type: 'rolling',
+  { id: 'shell-foundation', name: 'Shell Foundation — Climate & Clean Energy', region: 'global', type: 'rolling', category: 'grant',
     value: 'USD 200K–2M (non-dilutive grant + advisory)', domain: 'Clean energy, circular economy, sustainable materials',
     eligibility: 'Social enterprises with market-based models in developing markets',
     url: 'https://www.shellfoundation.org/',
     notes: 'Shell Foundation funds enterprises blending commercial viability with social/environmental impact. Bambrew\'s India manufacturing + rural bamboo sourcing fits their portfolio thesis.' },
 
-  { id: 'temasek-forward', name: 'Temasek Foundation — Climate Forward', region: 'global', type: 'rolling',
+  { id: 'temasek-forward', name: 'Temasek Foundation — Climate Forward', region: 'global', type: 'rolling', category: 'grant',
     value: 'SGD 100K–500K per grant', domain: 'Climate, sustainability, circular economy in Asia',
     eligibility: 'Asia-focused enterprises; Singapore entity helpful but not mandatory',
     url: 'https://www.temasekfoundation.org.sg/',
     notes: 'Temasek Foundation actively funds Asia-based sustainable materials and circular economy ventures. Bambrew\'s India operations and bamboo supply chain are a thematic fit.' },
 
-  { id: 'accenture-sustainability', name: 'Accenture Sustainability Innovation Challenge', region: 'global', type: 'cyclical',
+  { id: 'accenture-sustainability', name: 'Accenture Sustainability Innovation Challenge', region: 'global', type: 'cyclical', category: 'award',
     value: 'USD 50K prize + Accenture partnership + investor access', domain: 'Sustainability technology innovation',
     eligibility: 'Global early-to-growth stage startups',
     url: 'https://www.accenture.com/in-en/services/sustainability/innovation',
@@ -1456,6 +1495,28 @@ async function syncStateToServer() {
 }
 
 let currentView = 'list';
+
+// ============================================================
+// CATEGORY TABS (Grants / Awards) — URL-synced
+// ============================================================
+function categoryFromPath() {
+  return location.pathname.replace(/\/+$/, '') === '/awards' ? 'award' : 'grant';
+}
+let currentCategory = categoryFromPath();
+
+function setCategory(cat) {
+  currentCategory = cat;
+  const path = cat === 'award' ? '/awards' : '/grants';
+  if (location.pathname !== path) history.pushState({ category: cat }, '', path);
+  render();
+}
+window.addEventListener('popstate', () => {
+  currentCategory = categoryFromPath();
+  render();
+});
+function categoryGrants() {
+  return allGrants().filter(g => (g.category || 'grant') === currentCategory);
+}
 
 function saveUserGrants() {
   localStorage.setItem('bambrew-user-grants', JSON.stringify(userGrants));
@@ -1628,7 +1689,7 @@ function filtered() {
   const t = document.getElementById('filter-type').value;
   const sort = document.getElementById('sort-by').value;
 
-  let out = allGrants().filter(g => {
+  let out = categoryGrants().filter(g => {
     if (s && getStatus(g.id) !== s) return false;
     if (r && g.region !== r) return false;
     if (t && g.type !== t) return false;
@@ -1660,9 +1721,9 @@ function filtered() {
 // SUMMARY TILES
 // ============================================================
 function renderTiles() {
-  const total = allGrants().length;
+  const total = categoryGrants().length;
   let upcoming30 = 0, upcoming60 = 0, upcoming90 = 0, inProgress = 0, stale = 0;
-  allGrants().forEach(g => {
+  categoryGrants().forEach(g => {
     if (g.deadline) {
       const d = daysBetween(TODAY, effectiveDeadline(g));
       if (d >= 0 && d <= 30) upcoming30++;
@@ -1751,7 +1812,7 @@ function openReviewQueue() {
 }
 
 function openDeadlineModal(maxDays) {
-  const matching = allGrants().filter(g => {
+  const matching = categoryGrants().filter(g => {
     if (!g.deadline) return false;
     const d = daysBetween(TODAY, effectiveDeadline(g));
     return d >= 0 && d <= maxDays;
@@ -1876,7 +1937,7 @@ function renderCalendar() {
 
   // collect events for this month
   const events = {};
-  allGrants().forEach(g => {
+  categoryGrants().forEach(g => {
     [['launch', g.launch], ['deadline', g.deadline]].forEach(([kind, ds]) => {
       if (!ds) return;
       const d = new Date(ds);
@@ -1927,11 +1988,11 @@ function renderCalendar() {
   document.getElementById('calendar-grid').innerHTML = html;
 
   // Rolling chips
-  const rolling = allGrants().filter(g => g.type === 'rolling' ||
+  const rolling = categoryGrants().filter(g => g.type === 'rolling' ||
     (g.type === 'cyclical' && !g.deadline) ||
     (g.deadline && !(effectiveDeadline(g).getFullYear() === year && effectiveDeadline(g).getMonth() === month)));
   // narrow to just rolling for the strip
-  const rollingOnly = allGrants().filter(g => g.type === 'rolling');
+  const rollingOnly = categoryGrants().filter(g => g.type === 'rolling');
   document.getElementById('rolling-chips').innerHTML = rollingOnly.map(g =>
     `<span class="rolling-chip" onclick="openModal('${g.id}')" style="cursor:pointer;">${g.name}</span>`
   ).join('');
@@ -2030,6 +2091,11 @@ function openQuickAdd(newsIdx) {
         <option value="multilateral">Multilateral</option>
         <option value="global" selected>Global / Corporate</option>
       </select></div>
+    <div class="row"><div class="label-k">Category</div>
+      <select id="qa-category" class="qa-input">
+        <option value="grant" ${/award|prize/i.test(n.title || '') ? '' : 'selected'}>Grant</option>
+        <option value="award" ${/award|prize/i.test(n.title || '') ? 'selected' : ''}>Award</option>
+      </select></div>
     <div class="row"><div class="label-k">Type</div>
       <select id="qa-type" class="qa-input">
         <option value="deadline">Fixed Deadline</option>
@@ -2056,6 +2122,7 @@ function saveQuickAdd(slug, url) {
     id: slug,
     name: name,
     region: document.getElementById('qa-region').value,
+    category: document.getElementById('qa-category').value,
     type: document.getElementById('qa-type').value,
     value: document.getElementById('qa-value').value.trim() || 'Varies',
     domain: document.getElementById('qa-domain').value.trim() || '—',
@@ -2131,7 +2198,7 @@ function renderLastRefresh() {
 function renderPastToggle() {
   const el = document.getElementById('past-deadline-toggle');
   if (!el) return;
-  const pastCount = allGrants().filter(g => {
+  const pastCount = categoryGrants().filter(g => {
     if (!g.deadline) return false;
     const d = daysBetween(TODAY, effectiveDeadline(g));
     const st = getStatus(g.id);
@@ -2145,7 +2212,17 @@ function renderPastToggle() {
   }
 }
 
+function updateTabUI() {
+  document.getElementById('tab-grant').classList.toggle('active', currentCategory === 'grant');
+  document.getElementById('tab-award').classList.toggle('active', currentCategory === 'award');
+  const grantCount = allGrants().filter(g => (g.category || 'grant') === 'grant').length;
+  const awardCount = allGrants().filter(g => (g.category || 'grant') === 'award').length;
+  document.getElementById('tab-count-grant').textContent = grantCount;
+  document.getElementById('tab-count-award').textContent = awardCount;
+}
+
 function render() {
+  updateTabUI();
   renderTiles();
   renderNews();
   renderLastRefresh();
@@ -2158,6 +2235,10 @@ function render() {
 }
 
 async function bootstrap() {
+  // normalize bare "/" to the default tab so the URL always reflects state
+  if (location.pathname !== '/grants' && location.pathname !== '/awards') {
+    history.replaceState({ category: currentCategory }, '', currentCategory === 'award' ? '/awards' : '/grants');
+  }
   await loadStateFromServer();
   render();
 }

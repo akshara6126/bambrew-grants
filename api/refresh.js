@@ -117,6 +117,7 @@ export default async function handler(req, res) {
       id: makeId(x.link),
       name: x.title,
       region: 'india',
+      category: /award|prize/i.test(x.title) ? 'award' : 'grant',
       type: 'deadline',
       value: 'See source',
       domain: 'Auto-detected from news headline',
