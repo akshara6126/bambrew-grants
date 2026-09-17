@@ -1,6 +1,8 @@
 // Vercel cron: runs every Monday at 9am IST (3:30 UTC)
 // Fetches Google News for grant-related keywords, saves to KV.
 // No GitHub push / redeploy needed — frontend reads from /api/auto-grants.
+// KEYWORDS mirrors scripts/keywords.txt (the news-drawer pipeline's source list) —
+// keep the two in sync; add new terms to keywords.txt and copy them here too.
 
 import { kv } from '@vercel/kv';
 
@@ -13,31 +15,96 @@ const KEYWORDS = [
   '"BIRAC BIG" grant',
   '"DBT BIRAC" call 2026',
   '"NABARD" climate fund 2026',
+  '"NABARD Green Impact Fund"',
   '"NITI Aayog" "Atal Innovation Mission" circular',
   '"Atal New India Challenge" startup',
   '"ELEVATE Karnataka" 2026',
+  '"ELEVATE NxT" Karnataka startup',
   '"C-CAMP" sustainability grant',
   '"TDB" "India-Finland" 2026',
   '"Marico Innovation Foundation"',
+  '"CBE JU" films coatings 2026',
+  '"EU LIFE Programme" circular economy 2026',
   '"Horizon Europe" circular packaging',
   '"Innovate UK" SSPP plastic packaging',
+  '"IKEA Foundation" India circular',
   '"Bezos Earth Fund" biopolymer',
   '"Earthshot Prize" 2027',
   '"Green Climate Fund" India NABARD',
   '"ADB Ventures" climate India',
   'India plastic waste management rules 2026',
+  'India circular economy grant 2026',
   'sustainable packaging India funding 2026',
   'compostable packaging startup India funding',
-  '"EPR" "plastic" India 2026',
-  '"single-use plastic" ban India 2026',
-  '"bamboo packaging" India',
-  '"circular packaging" India brand',
-  '"compostable bags" India launch',
+  '"sustainable packaging" India 2026',
+  '"compostable packaging" India',
   '"biodegradable packaging" India launch',
   '"plastic-free packaging" India',
+  '"circular packaging" India brand',
+  '"EPR" "plastic" India 2026',
+  '"single-use plastic" ban India 2026',
+  '"compostable bags" India launch',
+  '"bamboo packaging" India',
+  '"commits to" "plastic-free" packaging',
+  '"pledges" "sustainable packaging"',
+  '"100% sustainable packaging"',
+  '"plastic-free pledge" brand',
+  '"transition to" "compostable packaging"',
+  '"phase out plastic" packaging brand',
+  '"net zero" packaging India',
+  '"ESG" packaging India brand',
+  '"recycled content" packaging India brand',
+  'FMCG "sustainable packaging" India',
+  'D2C brand "plastic-free" India',
+  '"compostable films" India',
+  '"compostable film" launch',
+  '"bio films" packaging India',
+  '"compostable wrappers"',
+  '"compostable mailers" India',
+  '"biodegradable courier bags" India',
+  '"compostable cutlery" India',
+  '"biodegradable mulch film"',
+  '"compostable food packaging" India',
+  '"compostable trays" India',
+  '"sustainability grant" India 2026',
+  '"sustainability funding" startup India',
+  '"climate tech funding" India 2026',
+  '"cleantech grants" India',
+  '"green tech grants" India',
+  '"ESG funding" startup India',
+  '"impact investment" circular economy India',
+  '"carbon credit" startup grant India',
+  '"climate fund" India 2026 startup',
+  '"green finance" India startup 2026',
+  '"environmental grants" India 2026',
+  '"Extended Producer Responsibility" India',
+  '"EPR" packaging India 2026',
+  '"single-use plastic alternatives" India',
+  '"plastic ban" India 2026 alternatives',
+  '"ASEAN" circular economy grant',
+  '"UNDP India" sustainability grant',
+  '"UNEP India" plastic grant',
+  '"World Bank India" sustainable packaging',
+  '"compostable garbage bags" India',
+  '"compostable bin liners" India',
+  '"home compostable bags" launch',
+  '"biodegradable trash bags" India',
+  '"compostable waste bags" India',
+  '"sustainability initiative" packaging India',
+  '"launches" "sustainable packaging" India',
+  '"launches" "compostable" India',
+  '"introduces" "compostable packaging" India',
+  '"rolls out" "sustainable packaging"',
+  '"adopts" "compostable packaging"',
+  '"switches to" "sustainable packaging" India',
+  '"sustainability commitment" brand India',
+  '"partners with" "sustainable packaging" India',
+  '"collaborates" "sustainable packaging" India',
+  'brand "goes plastic-free" India',
+  'company "eco-friendly packaging" India launch',
   '"sustainable packaging" "Series A" OR "seed" India 2026',
   '"green bond" India startup 2026',
-  '"climate tech" India funding 2026',
+  '"climate tech" India funding 2026'
 ];
 
 const GRANT_TOKENS = ['grant','scheme','fund ','funding','challenge','prize','call for proposals',
@@ -96,8 +163,8 @@ export default async function handler(req, res) {
   try {
     const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
     const results = [];
-    for (let i = 0; i < KEYWORDS.length; i += 5) {
-      const items = await Promise.all(KEYWORDS.slice(i, i + 5).map(fetchKeyword));
+    for (let i = 0; i < KEYWORDS.length; i += 10) {
+      const items = await Promise.all(KEYWORDS.slice(i, i + 10).map(fetchKeyword));
       results.push(...items.flat());
     }
 

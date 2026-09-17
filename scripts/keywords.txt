@@ -120,3 +120,8 @@ D2C brand "plastic-free" India
 "collaborates" "sustainable packaging" India
 brand "goes plastic-free" India
 company "eco-friendly packaging" India launch
+
+# === Startup funding signals ===
+"sustainable packaging" "Series A" OR "seed" India 2026
+"green bond" India startup 2026
+"climate tech" India funding 2026
