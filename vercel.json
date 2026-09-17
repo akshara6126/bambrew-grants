@@ -5,8 +5,8 @@
   "framework": null,
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/grants", "destination": "/index.html" },
-    { "source": "/awards", "destination": "/index.html" }
+    { "source": "/grants", "destination": "/" },
+    { "source": "/awards", "destination": "/" }
   ],
   "crons": [
     { "path": "/api/refresh", "schedule": "30 3 * * 1" }
