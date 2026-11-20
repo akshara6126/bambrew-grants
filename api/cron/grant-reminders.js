@@ -5,11 +5,10 @@
 //   ?dryRun=1                → don't send or record anything; return items + email HTML
 //   ?dryRun=1&date=YYYY-MM-DD → simulate another day
 //
-// Env: GMAIL_PASS (Gmail app password for bambrewcompliance@gmail.com), KV vars (already on the project).
+// Env: MAIL_RELAY_SECRET (shared with the compliance project), KV vars (already on the project).
 // Optional: REMINDER_SECRET for signing Accept/Reject links (falls back to KV token).
 
 import { kv } from '@vercel/kv';
-import nodemailer from 'nodemailer';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
@@ -19,8 +18,19 @@ import {
 export const SITE_URL = 'https://bambrew-grants.vercel.app';
 const SHARED_KEY = 'bambrew-shared-state';
 const LOG_KEY = 'grant-reminder-log';
-// Same sender as the compliance dashboard. Password comes from the GMAIL_PASS env var.
-const GMAIL_USER = process.env.GMAIL_USER || 'bambrewcompliance@gmail.com';
+// Emails go out through the compliance dashboard's Gmail (bambrewcompliance@gmail.com)
+// via its /api/mail-relay endpoint, so the Gmail password is stored in one place only.
+const MAIL_RELAY_URL = 'https://bambrew-compliance.vercel.app/api/mail-relay';
+
+async function sendMail({ subject, html }) {
+  if (!process.env.MAIL_RELAY_SECRET) throw new Error('MAIL_RELAY_SECRET env var is not set on this Vercel project');
+  const r = await fetch(MAIL_RELAY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.MAIL_RELAY_SECRET}` },
+    body: JSON.stringify({ to: RECIPIENTS, subject, html, fromName: 'Bambrew Grants' }),
+  });
+  if (!r.ok) throw new Error(`Mail relay failed: HTTP ${r.status} ${await r.text()}`);
+}
 
 export default async function handler(req, res) {
   const dryRun = req.query.dryRun === '1';
@@ -47,14 +57,7 @@ export default async function handler(req, res) {
     if (dryRun) {
       return res.status(200).json({ ok: true, dryRun: true, today, recipients: RECIPIENTS, subject, items: summary, html });
     }
-    if (!process.env.GMAIL_PASS) {
-      throw new Error('GMAIL_PASS env var (Gmail app password for ' + GMAIL_USER + ') is not set on this Vercel project');
-    }
-
-    await nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: GMAIL_USER, pass: process.env.GMAIL_PASS },
-    }).sendMail({ from: `Bambrew Grants <${GMAIL_USER}>`, to: RECIPIENTS.join(', '), subject, html });
+    await sendMail({ subject, html });
 
     await kv.set(LOG_KEY, markSent(log, due, today));
     return res.status(200).json({ ok: true, today, sent: true, recipients: RECIPIENTS, items: summary });
