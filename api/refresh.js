@@ -6,43 +6,43 @@
 
 import { kv } from '@vercel/kv';
 
-const KEYWORDS = [
+const KEYWORD_TEMPLATES = [
   'Bambrew sustainable packaging',
   'biopolymer packaging India',
   'PBAT compostable India',
   'PLA biodegradable India',
-  '"BIRAC BioE3" 2026',
+  '"BIRAC BioE3" {YEAR}',
   '"BIRAC BIG" grant',
-  '"DBT BIRAC" call 2026',
-  '"NABARD" climate fund 2026',
+  '"DBT BIRAC" call {YEAR}',
+  '"NABARD" climate fund {YEAR}',
   '"NABARD Green Impact Fund"',
   '"NITI Aayog" "Atal Innovation Mission" circular',
   '"Atal New India Challenge" startup',
-  '"ELEVATE Karnataka" 2026',
+  '"ELEVATE Karnataka" {YEAR}',
   '"ELEVATE NxT" Karnataka startup',
   '"C-CAMP" sustainability grant',
-  '"TDB" "India-Finland" 2026',
+  '"TDB" "India-Finland" {YEAR}',
   '"Marico Innovation Foundation"',
-  '"CBE JU" films coatings 2026',
-  '"EU LIFE Programme" circular economy 2026',
+  '"CBE JU" films coatings {YEAR}',
+  '"EU LIFE Programme" circular economy {YEAR}',
   '"Horizon Europe" circular packaging',
   '"Innovate UK" SSPP plastic packaging',
   '"IKEA Foundation" India circular',
   '"Bezos Earth Fund" biopolymer',
-  '"Earthshot Prize" 2027',
+  '"Earthshot Prize" {NEXT_YEAR}',
   '"Green Climate Fund" India NABARD',
   '"ADB Ventures" climate India',
-  'India plastic waste management rules 2026',
-  'India circular economy grant 2026',
-  'sustainable packaging India funding 2026',
+  'India plastic waste management rules {YEAR}',
+  'India circular economy grant {YEAR}',
+  'sustainable packaging India funding {YEAR}',
   'compostable packaging startup India funding',
-  '"sustainable packaging" India 2026',
+  '"sustainable packaging" India {YEAR}',
   '"compostable packaging" India',
   '"biodegradable packaging" India launch',
   '"plastic-free packaging" India',
   '"circular packaging" India brand',
-  '"EPR" "plastic" India 2026',
-  '"single-use plastic" ban India 2026',
+  '"EPR" "plastic" India {YEAR}',
+  '"single-use plastic" ban India {YEAR}',
   '"compostable bags" India launch',
   '"bamboo packaging" India',
   '"commits to" "plastic-free" packaging',
@@ -66,21 +66,21 @@ const KEYWORDS = [
   '"biodegradable mulch film"',
   '"compostable food packaging" India',
   '"compostable trays" India',
-  '"sustainability grant" India 2026',
+  '"sustainability grant" India {YEAR}',
   '"sustainability funding" startup India',
-  '"climate tech funding" India 2026',
+  '"climate tech funding" India {YEAR}',
   '"cleantech grants" India',
   '"green tech grants" India',
   '"ESG funding" startup India',
   '"impact investment" circular economy India',
   '"carbon credit" startup grant India',
-  '"climate fund" India 2026 startup',
-  '"green finance" India startup 2026',
-  '"environmental grants" India 2026',
+  '"climate fund" India {YEAR} startup',
+  '"green finance" India startup {YEAR}',
+  '"environmental grants" India {YEAR}',
   '"Extended Producer Responsibility" India',
-  '"EPR" packaging India 2026',
+  '"EPR" packaging India {YEAR}',
   '"single-use plastic alternatives" India',
-  '"plastic ban" India 2026 alternatives',
+  '"plastic ban" India {YEAR} alternatives',
   '"ASEAN" circular economy grant',
   '"UNDP India" sustainability grant',
   '"UNEP India" plastic grant',
@@ -102,10 +102,16 @@ const KEYWORDS = [
   '"collaborates" "sustainable packaging" India',
   'brand "goes plastic-free" India',
   'company "eco-friendly packaging" India launch',
-  '"sustainable packaging" "Series A" OR "seed" India 2026',
-  '"green bond" India startup 2026',
-  '"climate tech" India funding 2026'
+  '"sustainable packaging" "Series A" OR "seed" India {YEAR}',
+  '"green bond" India startup {YEAR}',
+  '"climate tech" India funding {YEAR}'
 ];
+
+// {YEAR}/{NEXT_YEAR} are filled in at run time so searches never go stale.
+function keywordsForNow() {
+  const y = new Date().getUTCFullYear();
+  return KEYWORD_TEMPLATES.map(k => k.replaceAll('{YEAR}', String(y)).replaceAll('{NEXT_YEAR}', String(y + 1)));
+}
 
 const GRANT_TOKENS = ['grant','scheme','fund ','funding','challenge','prize','call for proposals',
   'applications open','applications invited','award','innovation challenge','launches','announces',
@@ -117,7 +123,11 @@ const TRUSTED = ['economic times','business standard','mint','livemint','financi
   'inc42','yourstory','entrackr','vccircle','techcrunch','fortune india','business today',
   'down to earth','mongabay','eco-business','pib','press information bureau','pti','ani',
   'biospectrum','biovoice','pharmabiz','expresspharma','dbt.gov','birac.nic','dst.gov',
-  'nabard.org','niti.gov','startupindia.gov','makeinindia.com','abi.org.in'];
+  'nabard.org','niti.gov','startupindia.gov','makeinindia.com','abi.org.in',
+  'et government','etgovernment','packaging gateway','packaging insights','packaging europe',
+  'plastics news','bioplastics','the hindu','hindustan times','indian express','deccan herald',
+  'eco-business','edie','greenbiz','development bank','world bank','undp','unep','unido',
+  'european commission','eu-startups','innovate uk','ukri','devex','the guardian','carbon brief'];
 
 function isGrant(title) {
   const t = title.toLowerCase();
@@ -163,6 +173,7 @@ export default async function handler(req, res) {
   try {
     const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
     const results = [];
+    const KEYWORDS = keywordsForNow();
     for (let i = 0; i < KEYWORDS.length; i += 10) {
       const items = await Promise.all(KEYWORDS.slice(i, i + 10).map(fetchKeyword));
       results.push(...items.flat());

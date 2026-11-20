@@ -91,6 +91,15 @@ TRUSTED_SOURCE_PATTERNS = [
     "mongabay", "down to earth", "downtoearth", "carbon brief", "climate home",
     # --- Industry trade press (relevant to Bambrew) ---
     "biospectrum", "pharmabiz", "packaging south asia",
+    "packaging gateway", "packaging insights", "packaging europe", "packaging news",
+    "plastics news", "european plastics news", "bioplastics news", "bioplastics magazine",
+    "sustainable plastics", "eco-business", "edie", "greenbiz", "trellis",
+    # --- Indian government / economy desks ---
+    "et government", "etgovernment", "et energyworld", "et retail", "et brandequity",
+    "deccan herald", "new indian express", "business today", "fortune india", "india today", "ndtv",
+    # --- Funders / development banks / multilaterals ---
+    "development bank", "world bank", "asian development bank", "undp", "unep", "unido",
+    "european commission", "eu-startups", "cordis", "innovate uk", "ukri",
     # --- Devex (international grants) ---
     "devex",
 ]
@@ -367,8 +376,11 @@ def main():
         print("ERR · keywords.txt missing")
         sys.exit(1)
 
+    # {YEAR} / {NEXT_YEAR} in keywords.txt are filled in with the current year,
+    # so searches keep working as the calendar moves on.
+    this_year = datetime.datetime.now(datetime.timezone.utc).year
     keywords = [
-        line.strip()
+        line.strip().replace("{YEAR}", str(this_year)).replace("{NEXT_YEAR}", str(this_year + 1))
         for line in KEYWORDS_FILE.read_text(encoding="utf-8").splitlines()
         if line.strip() and not line.strip().startswith("#")
     ]

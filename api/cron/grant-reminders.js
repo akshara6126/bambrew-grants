@@ -4,6 +4,7 @@
 //
 //   ?dryRun=1                → don't send or record anything; return items + email HTML
 //   ?dryRun=1&date=YYYY-MM-DD → simulate another day
+//   ?discoverOnly=1          → only run the grant finder and save results (no email)
 //
 // Env: MAIL_RELAY_SECRET (shared with the compliance project), KV vars (already on the project).
 // Optional: REMINDER_SECRET for signing Accept/Reject links (falls back to KV token).
@@ -14,10 +15,12 @@ import { join } from 'node:path';
 import {
   RECIPIENTS, todayIST, collectDue, markSent, parseGrantsFromHtml, buildEmail,
 } from '../../lib/reminder-logic.js';
+import { runDiscovery } from '../../lib/discovery.js';
 
 export const SITE_URL = 'https://bambrew-grants.vercel.app';
 const SHARED_KEY = 'bambrew-shared-state';
 const LOG_KEY = 'grant-reminder-log';
+const DISCOVERED_KEY = 'discovered-grants';
 // Emails go out through the compliance dashboard's Gmail (bambrewcompliance@gmail.com)
 // via its /api/mail-relay endpoint, so the Gmail password is stored in one place only.
 const MAIL_RELAY_URL = 'https://bambrew-compliance.vercel.app/api/mail-relay';
@@ -40,22 +43,37 @@ export default async function handler(req, res) {
   try {
     if (!secret) throw new Error('No signing secret (REMINDER_SECRET or KV_REST_API_TOKEN) available');
     const curated = parseGrantsFromHtml(readFileSync(join(process.cwd(), 'index.html'), 'utf8'));
-    const [shared, savedLog] = await Promise.all([kv.get(SHARED_KEY), kv.get(LOG_KEY)]);
+    const [shared, savedLog, storedDiscovered] = await Promise.all([kv.get(SHARED_KEY), kv.get(LOG_KEY), kv.get(DISCOVERED_KEY)]);
     const userState = (shared && shared.userState) || {};
     const userGrants = (shared && shared.userGrants) || [];
+    const dismissed = new Set((shared && shared.dismissedAutoIds) || []);
     const log = { notified: {}, reminded: {}, ...(savedLog || {}) };
 
-    const due = collectDue(curated.concat(userGrants), userState, log, today);
+    // 1. Look for newly opened calls on the official portals (never blocks reminders).
+    let discovered = storedDiscovered || { items: {}, sources: {} };
+    try {
+      discovered = await runDiscovery(discovered, today);
+      if (!dryRun) await kv.set(DISCOVERED_KEY, discovered);
+    } catch (e) {
+      console.error('discovery failed:', e);
+    }
+    if (req.query.discoverOnly === '1') {
+      return res.status(200).json({ ok: true, today, discoverOnly: true, found: Object.keys(discovered.items || {}).length, sources: discovered.sources });
+    }
+    const found = Object.values(discovered.items || {}).filter(g => !dismissed.has(g.id));
+
+    // 2. Work out today's notifications and reminders across curated + user-added + found calls.
+    const due = collectDue(curated.concat(userGrants, found), userState, log, today);
     const summary = [...due.notifications.map(i => ({ type: 'notification', ...i })), ...due.reminders.map(i => ({ type: 'reminder', ...i }))]
       .map(({ type, id, name, category, deadline, daysLeft, status, estimated }) => ({ type, id, name, category, deadline, daysLeft, status, estimated }));
 
     if (!summary.length) {
-      return res.status(200).json({ ok: true, today, sent: false, reason: 'nothing due today' });
+      return res.status(200).json({ ok: true, today, sent: false, reason: 'nothing due today', sources: discovered.sources });
     }
-    const { subject, html } = buildEmail(due, today, SITE_URL, secret);
+    const { subject, html } = buildEmail(due, today, SITE_URL, secret, discovered.sources);
 
     if (dryRun) {
-      return res.status(200).json({ ok: true, dryRun: true, today, recipients: RECIPIENTS, subject, items: summary, html });
+      return res.status(200).json({ ok: true, dryRun: true, today, recipients: RECIPIENTS, subject, items: summary, sources: discovered.sources, html });
     }
     await sendMail({ subject, html });
 

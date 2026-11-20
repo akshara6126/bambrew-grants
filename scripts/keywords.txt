@@ -9,44 +9,44 @@ PBAT compostable India
 PLA biodegradable India
 
 # === India grant bodies ===
-"BIRAC BioE3" 2026
+"BIRAC BioE3" {YEAR}
 "BIRAC BIG" grant
-"DBT BIRAC" call 2026
-"NABARD" climate fund 2026
+"DBT BIRAC" call {YEAR}
+"NABARD" climate fund {YEAR}
 "NABARD Green Impact Fund"
 "NITI Aayog" "Atal Innovation Mission" circular
 "Atal New India Challenge" startup
-"ELEVATE Karnataka" 2026
+"ELEVATE Karnataka" {YEAR}
 "ELEVATE NxT" Karnataka startup
 "C-CAMP" sustainability grant
-"TDB" "India-Finland" 2026
+"TDB" "India-Finland" {YEAR}
 "Marico Innovation Foundation"
 
 # === International programmes ===
-"CBE JU" films coatings 2026
-"EU LIFE Programme" circular economy 2026
+"CBE JU" films coatings {YEAR}
+"EU LIFE Programme" circular economy {YEAR}
 "Horizon Europe" circular packaging
 "Innovate UK" SSPP plastic packaging
 "IKEA Foundation" India circular
 "Bezos Earth Fund" biopolymer
-"Earthshot Prize" 2027
+"Earthshot Prize" {NEXT_YEAR}
 "Green Climate Fund" India NABARD
 "ADB Ventures" climate India
 
 # === Sector + regulation ===
-India plastic waste management rules 2026
-India circular economy grant 2026
-sustainable packaging India funding 2026
+India plastic waste management rules {YEAR}
+India circular economy grant {YEAR}
+sustainable packaging India funding {YEAR}
 compostable packaging startup India funding
 
 # === Sustainable / compostable / plastic-free packaging news ===
-"sustainable packaging" India 2026
+"sustainable packaging" India {YEAR}
 "compostable packaging" India
 "biodegradable packaging" India launch
 "plastic-free packaging" India
 "circular packaging" India brand
-"EPR" "plastic" India 2026
-"single-use plastic" ban India 2026
+"EPR" "plastic" India {YEAR}
+"single-use plastic" ban India {YEAR}
 "compostable bags" India launch
 "bamboo packaging" India
 
@@ -76,23 +76,23 @@ D2C brand "plastic-free" India
 "compostable trays" India
 
 # === Sustainability / climate / green funding ===
-"sustainability grant" India 2026
+"sustainability grant" India {YEAR}
 "sustainability funding" startup India
-"climate tech funding" India 2026
+"climate tech funding" India {YEAR}
 "cleantech grants" India
 "green tech grants" India
 "ESG funding" startup India
 "impact investment" circular economy India
 "carbon credit" startup grant India
-"climate fund" India 2026 startup
-"green finance" India startup 2026
-"environmental grants" India 2026
+"climate fund" India {YEAR} startup
+"green finance" India startup {YEAR}
+"environmental grants" India {YEAR}
 
 # === Policy + regulation (market tailwinds) ===
 "Extended Producer Responsibility" India
-"EPR" packaging India 2026
+"EPR" packaging India {YEAR}
 "single-use plastic alternatives" India
-"plastic ban" India 2026 alternatives
+"plastic ban" India {YEAR} alternatives
 
 # === Multilateral & regional channels ===
 "ASEAN" circular economy grant
@@ -122,6 +122,6 @@ brand "goes plastic-free" India
 company "eco-friendly packaging" India launch
 
 # === Startup funding signals ===
-"sustainable packaging" "Series A" OR "seed" India 2026
-"green bond" India startup 2026
-"climate tech" India funding 2026
+"sustainable packaging" "Series A" OR "seed" India {YEAR}
+"green bond" India startup {YEAR}
+"climate tech" India funding {YEAR}

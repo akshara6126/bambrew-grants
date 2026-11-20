@@ -29,7 +29,8 @@
       "maxDuration": 60
     },
     "api/cron/grant-reminders.js": {
-      "includeFiles": "index.html"
+      "includeFiles": "index.html",
+      "maxDuration": 60
     },
     "api/grant-decision.js": {
       "includeFiles": "index.html"

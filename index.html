@@ -1116,14 +1116,14 @@ const GRANTS = [
     eligibility: 'EU consortium (typically 3+ orgs ≥3 countries); India = third country',
     url: 'https://www.cbe.europa.eu/open-calls-proposals',
     launch: '2026-04-23', deadline: '2026-09-22',
-    notes: 'Sharpest international fit. Requires lining up EU consortium lead. Closes 17:00 CET.' },
+    notes: 'Sharpest international fit. Requires lining up EU consortium lead. Closes 17:00 CET.' , cycleMonths: 12 },
 
   { id: 'life', name: 'EU LIFE Programme 2026 — Circular Economy & Zero Pollution', region: 'eu', type: 'deadline', category: 'grant',
     value: '€79M topic (€2.3B prog.)', domain: 'Circular economy, zero pollution',
     eligibility: 'EU members + associated countries; SMEs, public, NGOs',
     url: 'https://cinea.ec.europa.eu/life-calls-proposals-2026_en',
     deadline: '2026-09-22',
-    notes: 'Pair with CBE JU under one EU partner-mapping exercise.' },
+    notes: 'Pair with CBE JU under one EU partner-mapping exercise.' , cycleMonths: 12 },
 
   { id: 'sspp', name: 'UK Innovate UK SSPP', region: 'uk', type: 'rolling', category: 'grant',
     value: '£200K – £4M (R&D); £1M – £12M (demo)', domain: 'Sustainable plastic packaging R&D',
@@ -1529,6 +1529,9 @@ function autoGrants() {
   const source = kvAutoGrants.length > 0 ? kvAutoGrants : (typeof AUTO_DISCOVERED_GRANTS !== 'undefined' ? AUTO_DISCOVERED_GRANTS : []);
   return source.filter(g => {
     if (dismissedAutoIds.includes(g.id)) return false;
+    // Calls found on official portals stay until their deadline passes;
+    // news leads (no deadline) drop off after 30 days.
+    if (g.verifiedSource && g.deadline) return new Date(g.deadline) >= TODAY;
     if (g.discoveredOn) {
       const ageDays = daysBetween(new Date(g.discoveredOn), TODAY);
       if (ageDays > 30) return false;
@@ -1888,7 +1891,9 @@ function renderList() {
       <tr ${isAuto ? 'style="background:#fffaeb;"' : ''}>
         <td class="grant-name">
           <span style="cursor:pointer;" onclick="openModal('${g.id}')">${g.name}</span>
-          ${isAuto ? '<span class="grant-flag" style="margin-left:6px;">🤖 Auto-discovered</span>' : ''}
+          ${isAuto ? (g.verifiedSource
+            ? `<span class="grant-flag" style="margin-left:6px;background:#edf7f2;color:#2a8f5e;">🔎 Found on ${({ eu: 'EU portal', birac: 'BIRAC', ifs: 'Innovate UK' })[g.source] || 'official portal'}</span>`
+            : '<span class="grant-flag" style="margin-left:6px;">🤖 News lead</span>') : ''}
           ${g.url ? `<a href="${g.url}" target="_blank">${g.url.replace('https://', '').replace('http://', '').replace(/\/+$/, '')}</a>` : ''}
           <div class="quick-actions">
             ${g.url ? `<a class="qa-btn" href="${g.url}" target="_blank" title="Open the grant's official website">🌐 Site</a>` : ''}
